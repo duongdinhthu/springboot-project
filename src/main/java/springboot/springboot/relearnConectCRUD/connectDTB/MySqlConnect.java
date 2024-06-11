@@ -1,5 +1,7 @@
 package springboot.springboot.relearnConectCRUD.connectDTB;
 
+import com.mysql.cj.x.protobuf.MysqlxDatatypes;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -9,7 +11,7 @@ public class MySqlConnect {
     public static Connection getMySQLConnection() throws SQLException {
         Connection conn = null;
         String hostName = "127.0.0.1";//127.0.1 hoac localhost
-        String dbName = "ordermanager";
+        String dbName = "perfume";
         String userName = "root";
         String password = "";
         //String connection( chuoi ket noi )
