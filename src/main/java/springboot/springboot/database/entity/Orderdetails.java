@@ -1,4 +1,4 @@
-package springboot.springboot.relearnConectCRUD.entity;
+package springboot.springboot.database.entity;
 
 import java.math.BigDecimal;
 import java.util.List;

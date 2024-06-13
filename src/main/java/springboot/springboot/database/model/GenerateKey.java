@@ -1,4 +1,4 @@
-package springboot.springboot.relearnConectCRUD.model;
+package springboot.springboot.database.model;
 
 public class GenerateKey {
 //    private static final String URL = "jdbc:mysql://localhost:3306/database_name";

@@ -1,4 +1,4 @@
-package springboot.springboot.relearnConectCRUD.entity;
+package springboot.springboot.database.entity;
 
 public class Imgproduct extends Entity<Integer>{
     private int imgproduct_id;

@@ -1,4 +1,4 @@
-package springboot.springboot.relearnConectCRUD.entity;
+package springboot.springboot.database.entity;
 
 public class Entity <T>{
     private T id;

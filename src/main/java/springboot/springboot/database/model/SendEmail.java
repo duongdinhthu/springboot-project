@@ -1,4 +1,4 @@
-package springboot.springboot.relearnConectCRUD.model;
+package springboot.springboot.database.model;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;

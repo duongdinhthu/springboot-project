@@ -1,8 +1,7 @@
-package springboot.springboot.relearnConectCRUD.entity;
+package springboot.springboot.database.entity;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 public class Customer extends Entity<Integer> {
     private int customer_id;

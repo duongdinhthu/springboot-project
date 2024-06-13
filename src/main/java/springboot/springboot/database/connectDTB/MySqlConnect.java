@@ -1,6 +1,4 @@
-package springboot.springboot.relearnConectCRUD.connectDTB;
-
-import com.mysql.cj.x.protobuf.MysqlxDatatypes;
+package springboot.springboot.database.connectDTB;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

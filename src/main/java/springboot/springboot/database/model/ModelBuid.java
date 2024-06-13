@@ -1,8 +1,10 @@
-package springboot.springboot.relearnConectCRUD.model;
+package springboot.springboot.database.model;
+
 
 import org.springframework.stereotype.Component;
-import springboot.springboot.relearnConectCRUD.connectDTB.MySqlConnect;
-import springboot.springboot.relearnConectCRUD.entity.Entity;
+import springboot.springboot.database.connectDTB.MySqlConnect;
+import springboot.springboot.database.entity.Entity;
+
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

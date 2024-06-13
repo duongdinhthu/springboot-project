@@ -1,4 +1,4 @@
-package springboot.springboot.relearnConectCRUD.entity;
+package springboot.springboot.database.entity;
 
 public class Staff extends Entity<Integer>{
     private int staff_id;

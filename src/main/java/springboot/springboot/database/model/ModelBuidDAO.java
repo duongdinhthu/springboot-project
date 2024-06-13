@@ -1,10 +1,12 @@
-package springboot.springboot.relearnConectCRUD.model;
+package springboot.springboot.database.model;
+
 
 
 
 
 import org.springframework.stereotype.Repository;
-import springboot.springboot.relearnConectCRUD.entity.Entity;
+import springboot.springboot.database.entity.Entity;
+
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
