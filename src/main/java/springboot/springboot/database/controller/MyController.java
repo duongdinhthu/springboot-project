@@ -42,10 +42,12 @@ public class MyController<T extends Entity<?>> {
     }
 
     @PutMapping("/update")
-    public void update(@RequestBody Entity entity, @RequestParam String objectType) throws SQLException, IllegalAccessException {
+    public void update(@RequestBody Map<String, Object> requestData, @RequestParam String objectType) throws SQLException, IllegalAccessException {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.addConverter(new StringToDateConverter());
         if ("customer".equals(objectType)) {
-            Customer customer = new Customer();
-            model.update(entity);
+            Customer customer = modelMapper.map(requestData, Customer.class);
+            model.update(customer);
         }
 
     }
