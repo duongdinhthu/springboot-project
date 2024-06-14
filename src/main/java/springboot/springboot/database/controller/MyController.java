@@ -1,6 +1,7 @@
 package springboot.springboot.database.controller;
 
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import springboot.springboot.database.model.ModelBuid;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -28,10 +30,15 @@ public class MyController<T extends Entity<?>> {
     }
 
 
-
     @PostMapping("/insert")
-    public int insert(@RequestBody Entity entity) throws SQLException, IllegalAccessException {
-        return model.insert(entity);
+    public void insert(@RequestBody Map<String, Object> requestData, @RequestParam String objectType) throws SQLException, IllegalAccessException {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.addConverter(new StringToDateConverter());
+
+        if ("customer".equals(objectType)) {
+            Customer customer = modelMapper.map(requestData, Customer.class);
+            model.insert(customer);
+        }
     }
 
     @PutMapping("/update")
@@ -44,13 +51,13 @@ public class MyController<T extends Entity<?>> {
     }
 
     @DeleteMapping("/delete/{id}")
-    public String delete(@PathVariable int id ,@RequestParam String objectType) throws SQLException, IllegalAccessException {
-        if ("customer".equals(objectType)){
+    public String delete(@PathVariable int id, @RequestParam String objectType) throws SQLException, IllegalAccessException {
+        if ("customer".equals(objectType)) {
             Customer customer = new Customer();
             customer.setCustomer_id(id);
             model.delete(customer);
             return "success";
-        } else if ("product".equals(objectType)){
+        } else if ("product".equals(objectType)) {
             Product product = new Product();
             product.setProduct_id(id);
             model.delete(product);
@@ -64,6 +71,7 @@ public class MyController<T extends Entity<?>> {
 
         return "failed";
     }
+
     // Explicitly allow CORS for "/list" endpoint
     @GetMapping("/list")
     public List<T> list(@RequestParam String objectType) throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {

@@ -158,6 +158,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
 
     @Override
     public boolean update(Entity entity) throws SQLException, IllegalAccessException {
+        System.out.println(entity);
         Field[] fields = entity.getClass().getDeclaredFields();
         String query = queryUpdate(entity).toString();
         System.out.println(query);
