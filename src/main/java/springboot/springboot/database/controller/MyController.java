@@ -6,10 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import springboot.springboot.database.entity.Customer;
 import springboot.springboot.database.entity.Entity;
-import springboot.springboot.database.entity.Orders;
-import springboot.springboot.database.entity.Product;
+import springboot.springboot.database.entity.Patients;
 import springboot.springboot.database.model.ModelBuid;
 
 
@@ -34,9 +32,9 @@ public class MyController<T extends Entity<?>> {
     public void insert(@RequestBody Map<String, Object> requestData, @RequestParam String objectType) throws SQLException, IllegalAccessException {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
-        if ("customer".equals(objectType)) {
-            Customer customer = modelMapper.map(requestData, Customer.class);
-            model.insert(customer);
+        if ("patients".equals(objectType)) {
+            Patients patients = modelMapper.map(requestData, Patients.class);
+            model.insert(patients);
         }
     }
 
@@ -44,45 +42,34 @@ public class MyController<T extends Entity<?>> {
     public void update(@RequestBody Map<String, Object> requestData, @RequestParam String objectType) throws SQLException, IllegalAccessException {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
-        if ("customer".equals(objectType)) {
-            Customer customer = modelMapper.map(requestData, Customer.class);
-            model.update(customer);
+        if ("patients".equals(objectType)) {
+            Patients patients = modelMapper.map(requestData, Patients.class);
+            model.update(patients);
         }
 
     }
 
     @DeleteMapping("/delete/{id}")
     public String delete(@PathVariable int id, @RequestParam String objectType) throws SQLException, IllegalAccessException {
-        if ("customer".equals(objectType)) {
-            Customer customer = new Customer();
-            customer.setCustomer_id(id);
-            model.delete(customer);
+        if ("patients".equals(objectType)) {
+            Patients patients = new Patients();
+            patients.setPatient_id(id);
+            model.delete(patients);
             return "success";
-        } else if ("product".equals(objectType)) {
-            Product product = new Product();
-            product.setProduct_id(id);
-            model.delete(product);
-            return "success";
-        } else if ("orders".equals(objectType)) {
-            Orders order = new Orders();
-            order.setCustomer_id(id);
-            model.delete(order);
-            return "success";
+        }else {
+            return "error";
         }
 
-        return "failed";
+
     }
 
     // Explicitly allow CORS for "/list" endpoint
     @GetMapping("/list")
     public List<T> list(@RequestParam String objectType) throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         if ("customer".equals(objectType)) {
-            List<T> list = model.getAll(new Customer().getClass());
+            List<T> list = model.getAll(new Patients().getClass());
             return list;
-        } else if ("product".equals(objectType)) {
-            List<T> list = model.getAll(new Product().getClass());
-            return list;
-        } else {
+        }  else {
             // Xử lý khi loại đối tượng không đúng
             return null;
         }

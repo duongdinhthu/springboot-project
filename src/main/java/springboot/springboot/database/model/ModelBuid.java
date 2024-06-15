@@ -122,6 +122,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         for (Field field : fields) {
             field.setAccessible(true);
             Object value = field.get(entity);
+            System.out.println(value);
             preparedStatement.setObject(parameterIndex++, value);
         }
 

@@ -1,10 +1,7 @@
 package springboot.springboot.database.model;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import springboot.springboot.database.entity.Entity;
-
-
 import java.io.FileWriter;
 import java.util.List;
 import java.util.Scanner;
