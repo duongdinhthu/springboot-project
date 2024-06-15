@@ -116,6 +116,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
     public int insert(Entity entity) throws SQLException, IllegalAccessException {
         Field[] fields = entity.getClass().getDeclaredFields();
         String query = queryInsert(entity).toString();
+        System.out.println(query);
         PreparedStatement preparedStatement = openConnection().prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
         int parameterIndex = 1;
         for (Field field : fields) {
@@ -144,6 +145,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         for (Entity entity1 : entityList) {
             Field[] fields = entity1.getClass().getDeclaredFields();
             String query = queryInsert(entity1).toString();
+            System.out.println(query);
             pstm = openPstm(query);
             int parameterIndex = 1;
             for (Field field : fields) {
@@ -195,6 +197,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         List<T> entities = new ArrayList<>();
         String query = queryGetAll(entityClass).toString();
         pstm = openPstm(query);
+        System.out.println(query);
         ResultSet rs = exQuery();
         while (rs.next()) {
             T newEntity = (T) createEntityFromResultSet(rs, entityClass);
@@ -221,6 +224,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
     @Override
     public List<T> getEntityById(Entity entity) throws SQLException, IllegalAccessException, InstantiationException {
         String query = queryGetEntityById(entity).toString();
+        System.out.println(query);
         openPstm(query);
         Field[] fields = entity.getClass().getDeclaredFields();
         Map<String, Field> fieldMap = new HashMap<>();

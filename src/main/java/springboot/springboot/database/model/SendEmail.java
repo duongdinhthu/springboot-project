@@ -26,8 +26,9 @@ public class SendEmail {
             message.setFrom(new InternetAddress("thuddth2307004@fpt.edu.vn"));
             message.setRecipients(Message.RecipientType.TO,
                     InternetAddress.parse("godwu69@gmail.com"));
+
             message.setSubject("Testing Email");
-            message.setText("This is a test email");
+            message.setText("ok");
 
             Transport.send(message);
 
