@@ -1,6 +1,7 @@
 package springboot.springboot.database.model;
 
 
+
 import org.springframework.stereotype.Component;
 import springboot.springboot.database.connectDTB.MySqlConnect;
 import springboot.springboot.database.entity.Entity;
@@ -12,10 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
