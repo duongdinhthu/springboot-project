@@ -34,7 +34,6 @@ public class MyController<T extends Entity<?>> {
     public void insert(@RequestBody Map<String, Object> requestData, @RequestParam String objectType) throws SQLException, IllegalAccessException {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
-
         if ("customer".equals(objectType)) {
             Customer customer = modelMapper.map(requestData, Customer.class);
             model.insert(customer);
