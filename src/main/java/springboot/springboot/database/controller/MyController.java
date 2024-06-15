@@ -46,7 +46,6 @@ public class MyController<T extends Entity<?>> {
             Patients patients = modelMapper.map(requestData, Patients.class);
             model.update(patients);
         }
-
     }
 
     @DeleteMapping("/delete/{id}")
@@ -59,8 +58,6 @@ public class MyController<T extends Entity<?>> {
         }else {
             return "error";
         }
-
-
     }
 
     // Explicitly allow CORS for "/list" endpoint
@@ -75,9 +72,11 @@ public class MyController<T extends Entity<?>> {
         }
     }
 
-    @GetMapping("/getById")
-    public List<T> getEntityById(@RequestBody Entity entity) throws SQLException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
-        List<T> entity1 = model.getEntityById(entity);
+    @GetMapping("/getById/{id}")
+    public List<T> getEntityById(@PathVariable int id,@RequestParam String objectType) throws SQLException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+        Patients patients = new Patients();
+        patients.setPatient_id(id);
+        List<T> entity1 = model.getEntityById(patients);
         return entity1;
     }
 

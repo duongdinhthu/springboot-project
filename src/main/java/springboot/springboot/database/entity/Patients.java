@@ -1,6 +1,7 @@
 package springboot.springboot.database.entity;
 
 import java.util.Date;
+import java.util.List;
 
 public class Patients extends Entity<Integer> {
     private int patient_id;
@@ -11,7 +12,9 @@ public class Patients extends Entity<Integer> {
     private String patient_address;
     private String password;
     private String username;
-
+    private List<Appointments> appointmentsList;
+    private List<Medicalrecords> medicalrecordsList;
+    private List<Payment> paymentList;
     public Patients(String patient_name, Date patient_dob, String patient_email, int patient_phone, String patient_address, String password, String username) {
         this.patient_name = patient_name;
         this.patient_dob = patient_dob;
@@ -23,6 +26,55 @@ public class Patients extends Entity<Integer> {
     }
 
     public Patients() {
+    }
+
+    public Patients(String patient_name, Date patient_dob, String patient_email, int patient_phone, String patient_address, String password, String username, List<Appointments> appointmentsList, List<Medicalrecords> medicalrecordsList) {
+        this.patient_name = patient_name;
+        this.patient_dob = patient_dob;
+        this.patient_email = patient_email;
+        this.patient_phone = patient_phone;
+        this.patient_address = patient_address;
+        this.password = password;
+        this.username = username;
+        this.appointmentsList = appointmentsList;
+        this.medicalrecordsList = medicalrecordsList;
+    }
+
+    public Patients(String patient_name, Date patient_dob, String patient_email, int patient_phone, String patient_address, String password, String username, List<Appointments> appointmentsList, List<Medicalrecords> medicalrecordsList, List<Payment> paymentList) {
+        this.patient_name = patient_name;
+        this.patient_dob = patient_dob;
+        this.patient_email = patient_email;
+        this.patient_phone = patient_phone;
+        this.patient_address = patient_address;
+        this.password = password;
+        this.username = username;
+        this.appointmentsList = appointmentsList;
+        this.medicalrecordsList = medicalrecordsList;
+        this.paymentList = paymentList;
+    }
+
+    public List<Payment> getPaymentList() {
+        return paymentList;
+    }
+
+    public void setPaymentList(List<Payment> paymentList) {
+        this.paymentList = paymentList;
+    }
+
+    public List<Appointments> getAppointmentsList() {
+        return appointmentsList;
+    }
+
+    public void setAppointmentsList(List<Appointments> appointmentsList) {
+        this.appointmentsList = appointmentsList;
+    }
+
+    public List<Medicalrecords> getMedicalrecordsList() {
+        return medicalrecordsList;
+    }
+
+    public void setMedicalrecordsList(List<Medicalrecords> medicalrecordsList) {
+        this.medicalrecordsList = medicalrecordsList;
     }
 
     public int getPatient_id() {

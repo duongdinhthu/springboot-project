@@ -1,6 +1,8 @@
 package springboot.springboot.database.entity;
 
-public class Doctors extends Entity<Integer>{
+import java.util.List;
+
+public class Doctors extends Entity<Integer> {
     private int doctor_id;
     private String doctor_name;
     private int doctor_phone;
@@ -9,7 +11,8 @@ public class Doctors extends Entity<Integer>{
     private int department_id;
     private String username;
     private String password;
-
+    private List<Appointments> appointmentsList;
+    private List<Medicalrecords> medicalrecordsList;
     public Doctors(String doctor_name, int doctor_phone, String doctor_address, String doctor_email, int department_id, String username, String password) {
         this.doctor_name = doctor_name;
         this.doctor_phone = doctor_phone;
@@ -18,6 +21,60 @@ public class Doctors extends Entity<Integer>{
         this.department_id = department_id;
         this.username = username;
         this.password = password;
+    }
+
+    public Doctors() {
+    }
+
+    public Doctors(String doctor_name, int doctor_phone, String doctor_address, String doctor_email, int department_id, String username, String password, List<Medicalrecords> medicalrecordsList) {
+        this.doctor_name = doctor_name;
+        this.doctor_phone = doctor_phone;
+        this.doctor_address = doctor_address;
+        this.doctor_email = doctor_email;
+        this.department_id = department_id;
+        this.username = username;
+        this.password = password;
+        this.medicalrecordsList = medicalrecordsList;
+    }
+
+    public Doctors(int doctor_id, String doctor_name, int doctor_phone, String doctor_address, String doctor_email, int department_id, String username, String password, List<Appointments> appointmentsList) {
+        this.doctor_id = doctor_id;
+        this.doctor_name = doctor_name;
+        this.doctor_phone = doctor_phone;
+        this.doctor_address = doctor_address;
+        this.doctor_email = doctor_email;
+        this.department_id = department_id;
+        this.username = username;
+        this.password = password;
+        this.appointmentsList = appointmentsList;
+    }
+
+    public Doctors(String doctor_name, int doctor_phone, String doctor_address, String doctor_email, int department_id, String username, String password, List<Appointments> appointmentsList, List<Medicalrecords> medicalrecordsList) {
+        this.doctor_name = doctor_name;
+        this.doctor_phone = doctor_phone;
+        this.doctor_address = doctor_address;
+        this.doctor_email = doctor_email;
+        this.department_id = department_id;
+        this.username = username;
+        this.password = password;
+        this.appointmentsList = appointmentsList;
+        this.medicalrecordsList = medicalrecordsList;
+    }
+
+    public List<Appointments> getAppointmentsList() {
+        return appointmentsList;
+    }
+
+    public void setAppointmentsList(List<Appointments> appointmentsList) {
+        this.appointmentsList = appointmentsList;
+    }
+
+    public List<Medicalrecords> getMedicalrecordsList() {
+        return medicalrecordsList;
+    }
+
+    public void setMedicalrecordsList(List<Medicalrecords> medicalrecordsList) {
+        this.medicalrecordsList = medicalrecordsList;
     }
 
     public int getDoctor_id() {
