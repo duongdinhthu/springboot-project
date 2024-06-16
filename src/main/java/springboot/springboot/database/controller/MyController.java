@@ -11,6 +11,7 @@ import springboot.springboot.database.entity.Patients;
 import springboot.springboot.database.model.ModelBuid;
 
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
@@ -32,11 +33,24 @@ public class MyController<T extends Entity<?>> {
     public void insert(@RequestBody Map<String, Object> requestData, @RequestParam String objectType) throws SQLException, IllegalAccessException {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
+
         if ("patients".equals(objectType)) {
             Patients patients = modelMapper.map(requestData, Patients.class);
-            model.insert(patients);
+            Patients patients1 = new Patients(); // Tạo đối tượng patients1 mới
+
+            Field[] fields = patients.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                field.setAccessible(true);
+                Object value = field.get(patients);
+                if(value != null){
+                    // Nếu giá trị của field không phải là null thì sao chép giá trị sang patients1
+                    field.set(patients1, value);
+                }
+            }
+            model.insert(patients1);
         }
     }
+
 
     @PutMapping("/update")
     public void update(@RequestBody Map<String, Object> requestData, @RequestParam String objectType) throws SQLException, IllegalAccessException {
@@ -74,10 +88,17 @@ public class MyController<T extends Entity<?>> {
 
     @GetMapping("/getById/{id}")
     public List<T> getEntityById(@PathVariable int id,@RequestParam String objectType) throws SQLException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
-        Patients patients = new Patients();
-        patients.setPatient_id(id);
-        List<T> entity1 = model.getEntityById(patients);
-        return entity1;
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.addConverter(new StringToDateConverter());
+        if ("patients".equals(objectType)){
+            Patients patients = new Patients();
+            patients.setPatient_id(id);
+            List<T> entity1 = model.getEntityById(patients);
+            return entity1;
+        }else {
+            return null;
+        }
+
     }
 
     @PostMapping("/insertAll")

@@ -69,8 +69,49 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         query.append(")");
         return query;
     }
+    private StringBuilder queryInsertDemo(Entity entity) {
+        String tableName = getTableName((Class<T>) entity.getClass());
+        StringBuilder query = new StringBuilder("insert into ");
+        query.append(tableName).append(" (");
+        Field[] fields = entity.getClass().getDeclaredFields();
+        List<Field> includedFields = new ArrayList<>();
+        List<Object> fieldValues = new ArrayList<>();
 
-    private StringBuilder queryUpdate(Entity entity) {
+        for (Field field : fields) {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(entity);
+                if (value != null) {
+                    includedFields.add(field);
+                    fieldValues.add(value);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+        for (int i = 0; i < includedFields.size(); i++) {
+            if (i > 0) {
+                query.append(", ");
+            }
+            query.append(includedFields.get(i).getName());
+        }
+
+        query.append(") values (");
+
+        for (int i = 0; i < fieldValues.size(); i++) {
+            if (i > 0) {
+                query.append(", ");
+            }
+            query.append("?");
+        }
+        query.append(")");
+
+        // Set parameter values to the entity
+
+
+        return query;
+    }    private StringBuilder queryUpdate(Entity entity) {
         String tableName = getTableName((Class<T>) entity.getClass());
         StringBuilder query = new StringBuilder("update ");
         query.append(tableName).append(" set ");
