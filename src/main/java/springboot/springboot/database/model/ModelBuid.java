@@ -1,7 +1,6 @@
 package springboot.springboot.database.model;
 
 
-
 import org.springframework.stereotype.Component;
 import springboot.springboot.database.connectDTB.MySqlConnect;
 import springboot.springboot.database.entity.Entity;
@@ -69,10 +68,12 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         query.append(")");
         return query;
     }
+
     private StringBuilder queryInsertDemo(Entity entity) {
         String tableName = getTableName((Class<T>) entity.getClass());
         StringBuilder query = new StringBuilder("insert into ");
         query.append(tableName).append(" (");
+
         Field[] fields = entity.getClass().getDeclaredFields();
         List<Field> includedFields = new ArrayList<>();
         List<Object> fieldValues = new ArrayList<>();
@@ -81,7 +82,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
             field.setAccessible(true);
             try {
                 Object value = field.get(entity);
-                if (value != null) {
+                if (value != null && !field.getName().equals("appointmentsList")) {
                     includedFields.add(field);
                     fieldValues.add(value);
                 }
@@ -99,7 +100,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
 
         query.append(") values (");
 
-        for (int i = 0; i < fieldValues.size(); i++) {
+        for (int i = 0; i < includedFields.size(); i++) {
             if (i > 0) {
                 query.append(", ");
             }
@@ -107,11 +108,16 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         }
         query.append(")");
 
-        // Set parameter values to the entity
-
+        // In ra các trường và giá trị của chúng
+        for (int i = 0; i < includedFields.size(); i++) {
+            System.out.println(includedFields.get(i).getName());
+            System.out.println(fieldValues.get(i));
+        }
 
         return query;
-    }    private StringBuilder queryUpdate(Entity entity) {
+    }
+
+    private StringBuilder queryUpdate(Entity entity) {
         String tableName = getTableName((Class<T>) entity.getClass());
         StringBuilder query = new StringBuilder("update ");
         query.append(tableName).append(" set ");
@@ -154,13 +160,14 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
     @Override
     public int insert(Entity entity) throws SQLException, IllegalAccessException {
         Field[] fields = entity.getClass().getDeclaredFields();
-        String query = queryInsert(entity).toString();
+        String query = queryInsertDemo(entity).toString();
         System.out.println(query);
         PreparedStatement preparedStatement = openConnection().prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
         int parameterIndex = 1;
         for (Field field : fields) {
             field.setAccessible(true);
             Object value = field.get(entity);
+            System.out.println(field.getName());
             System.out.println(value);
             preparedStatement.setObject(parameterIndex++, value);
         }
