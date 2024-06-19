@@ -20,6 +20,19 @@ public class Appointments extends Entity<Integer>{
         this.status = status;
     }
 
+    public Appointments() {
+    }
+
+    public Appointments(int appointment_id, int patient_id, int doctor_id, Date appointment_date, Date medical_day, int slot, String status) {
+        this.appointment_id = appointment_id;
+        this.patient_id = patient_id;
+        this.doctor_id = doctor_id;
+        this.appointment_date = appointment_date;
+        this.medical_day = medical_day;
+        this.slot = slot;
+        this.status = status;
+    }
+
     public int getAppointment_id() {
         return appointment_id;
     }

@@ -12,6 +12,9 @@ public class Medicalrecords extends Entity<Integer>{
     private Date follow_up_date;
     private int doctor_id;
 
+    public Medicalrecords() {
+    }
+
     public Medicalrecords(int patient_id, String symptoms, String diagnosis, String treatment, String prescription, Date follow_up_date, int doctor_id) {
         this.patient_id = patient_id;
         this.symptoms = symptoms;

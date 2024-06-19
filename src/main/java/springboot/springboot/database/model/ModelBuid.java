@@ -8,10 +8,7 @@ import springboot.springboot.database.entity.Entity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 @Component
@@ -52,37 +49,13 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         StringBuilder query = new StringBuilder("insert into ");
         query.append(tableName).append(" (");
         Field[] fields = entity.getClass().getDeclaredFields();
-        for (int i = 0; i < fields.length; i++) {
-            if (i > 0) {
-                query.append(", ");
-            }
-            query.append(fields[i].getName());
-        }
-        query.append(") values (");
-        for (int i = 0; i < fields.length; i++) {
-            if (i > 0) {
-                query.append(", ");
-            }
-            query.append("?");
-        }
-        query.append(")");
-        return query;
-    }
-
-    private StringBuilder queryInsertDemo(Entity entity) {
-        String tableName = getTableName((Class<T>) entity.getClass());
-        StringBuilder query = new StringBuilder("insert into ");
-        query.append(tableName).append(" (");
-
-        Field[] fields = entity.getClass().getDeclaredFields();
         List<Field> includedFields = new ArrayList<>();
         List<Object> fieldValues = new ArrayList<>();
-
         for (Field field : fields) {
             field.setAccessible(true);
             try {
                 Object value = field.get(entity);
-                if (value != null && !field.getName().equals("appointmentsList")) {
+                if (value != null && !"0".equals(value.toString())) {
                     includedFields.add(field);
                     fieldValues.add(value);
                 }
@@ -90,14 +63,12 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
                 e.printStackTrace();
             }
         }
-
         for (int i = 0; i < includedFields.size(); i++) {
             if (i > 0) {
                 query.append(", ");
             }
             query.append(includedFields.get(i).getName());
         }
-
         query.append(") values (");
 
         for (int i = 0; i < includedFields.size(); i++) {
@@ -117,21 +88,57 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         return query;
     }
 
+
     private StringBuilder queryUpdate(Entity entity) {
         String tableName = getTableName((Class<T>) entity.getClass());
         StringBuilder query = new StringBuilder("update ");
         query.append(tableName).append(" set ");
+
         Field[] fields = entity.getClass().getDeclaredFields();
+        Field idField = fields[0];
+
+        List<Field> updatedFields = new ArrayList<>();
+        List<Object> fieldValues = new ArrayList<>();
+
         for (int i = 1; i < fields.length; i++) {
-            if (i > 1) {
+            fields[i].setAccessible(true);
+            try {
+                Object value = fields[i].get(entity);
+                if (value != null) {
+                    updatedFields.add(fields[i]);
+                    fieldValues.add(value);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+        for (int i = 0; i < updatedFields.size(); i++) {
+            if (i > 0) {
                 query.append(", ");
             }
-            query.append(fields[i].getName()).append(" = ?");
+            query.append(updatedFields.get(i).getName()).append(" = ").append("?");
+
+            // In ra tên trường và giá trị của trường
+            System.out.println(updatedFields.get(i).getName());
+            System.out.println(fieldValues.get(i));
         }
-        query.append(" where ").append(fields[0].getName()).append(" = ?");
+
+        query.append(" where ").append(idField.getName()).append(" = ?");
+
+        // In ra tên trường id và giá trị của trường id
+        idField.setAccessible(true);
+        try {
+            Object idValue = idField.get(entity);
+
+            System.out.println(idField.getName());
+            System.out.println(idValue);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
         return query;
     }
-
     private StringBuilder queryDelete(Entity entity) {
         String tableName = getTableName((Class<T>) entity.getClass());
         StringBuilder query = new StringBuilder("delete from ");
@@ -152,26 +159,50 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         String tableName = getTableName((Class<T>) entity.getClass());
         StringBuilder query = new StringBuilder("select * from ");
         query.append(tableName).append(" where ");
+
         Field[] fields = entity.getClass().getDeclaredFields();
-        query.append(fields[0].getName()).append(" = ?");
+        boolean foundField = false; // Biến để xác định xem trường nào có giá trị không
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(entity);
+                if (value != null && !"0".equals(value.toString())) {
+                    // Bỏ field có giá trị là null hoặc 0
+                    System.out.println(value);
+                    if (foundField) {
+                        query.append(" and ");
+                    }
+                    query.append(field.getName()).append(" = ?");
+                    foundField = true; // Đánh dấu rằng đã tìm thấy trường có giá trị
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace(); // Xử lý exception theo cách phù hợp
+            }
+        }
+
+        if (!foundField) {
+            // Xử lý trường hợp không tìm thấy trường có giá trị
+            // Ví dụ: Ghi log, throw exception, hoặc thực hiện hành động khác
+        }
+
         return query;
     }
 
     @Override
     public int insert(Entity entity) throws SQLException, IllegalAccessException {
         Field[] fields = entity.getClass().getDeclaredFields();
-        String query = queryInsertDemo(entity).toString();
-        System.out.println(query);
+        String query = queryInsert(entity).toString();
         PreparedStatement preparedStatement = openConnection().prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+        System.out.println(query);
         int parameterIndex = 1;
         for (Field field : fields) {
             field.setAccessible(true);
             Object value = field.get(entity);
-            System.out.println(field.getName());
-            System.out.println(value);
-            preparedStatement.setObject(parameterIndex++, value);
+            if (value != null && !"0".equals(value.toString())) {
+                preparedStatement.setObject(parameterIndex++, value);
+            }
         }
-
         int rowsAffected = preparedStatement.executeUpdate();
         if (rowsAffected > 0) {
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
@@ -212,14 +243,20 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         String query = queryUpdate(entity).toString();
         System.out.println(query);
         pstm = openPstm(query);
+
+        int parameterIndex = 1;
         for (int i = 1; i < fields.length; i++) {
             fields[i].setAccessible(true);
             Object value = fields[i].get(entity);
-            pstm.setObject(i, value);
+            if (value != null) {
+                pstm.setObject(parameterIndex++, value);
+            }
         }
+
         fields[0].setAccessible(true);
         Object value1 = fields[0].get(entity);
-        pstm.setObject(fields.length, value1);
+        pstm.setObject(parameterIndex, value1);
+
         boolean rowsUpdated = exUpdate();
         System.out.println(rowsUpdated);
         return rowsUpdated;
@@ -250,53 +287,77 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
             T newEntity = (T) createEntityFromResultSet(rs, entityClass);
             entities.add(newEntity);
         }
-
         return entities;
     }
 
 
     private T createEntityFromResultSet(ResultSet rs, Class<T> entityClass) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         T newEntity = entityClass.getDeclaredConstructor().newInstance();
-        Field[] fields = entityClass.getDeclaredFields();
-        for (Field field : fields) {
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
+        for (int i = 1; i <= columnCount; i++) {
+            String columnName = metaData.getColumnName(i);
+            Field field = null;
+            try {
+                field = entityClass.getDeclaredField(columnName);
+            } catch (NoSuchFieldException e) {
+                // Field không tồn tại trong lớp entityClass, bỏ qua
+                continue;
+            }
 
             field.setAccessible(true);
-            Object value = rs.getObject(field.getName());
-            field.set(newEntity, value);
-
+            Object value = rs.getObject(columnName);
+            if (value != null) {
+                field.set(newEntity, value);
+            }
         }
         return newEntity;
     }
 
     @Override
     public List<T> getEntityById(Entity entity) throws SQLException, IllegalAccessException, InstantiationException {
+        List<T> entityList = new ArrayList<>(); // Khai báo và khởi tạo entityList
+
         String query = queryGetEntityById(entity).toString();
         System.out.println(query);
         openPstm(query);
+
         Field[] fields = entity.getClass().getDeclaredFields();
-        Map<String, Field> fieldMap = new HashMap<>();
-        for (Field field : fields) {
-            fieldMap.put(field.getName(), field);
-        }
-        fields[0].setAccessible(true);
-        Object value = fields[0].get(entity);
-        pstm.setObject(1, value);
-        ResultSet rs = exQuery();
-        List<T> entityList = new ArrayList<>();
-        while (rs.next()) {
-            T newEntity = (T) entity.getClass().newInstance();
-            for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                String columnName = rs.getMetaData().getColumnName(i);
-                Field field = fieldMap.get(columnName);
-                if (field != null) {
-                    field.setAccessible(true);
-                    Object fieldValue = rs.getObject(i);
-                    field.set(newEntity, fieldValue);
-                }
+        List<Field> validFields = new ArrayList<>();
+
+        for (Field f : fields) {
+            f.setAccessible(true);
+            Object val = f.get(entity);
+            if (val != null && !"0".equals(val.toString())) {
+                validFields.add(f);
             }
-            entityList.add(newEntity);
         }
+
+        for (Field f : validFields) {
+            Object val = f.get(entity);
+            pstm.setObject(1, val);
+            ResultSet rs = exQuery();
+
+            while (rs.next()) {
+                T newEntity = (T) entity.getClass().newInstance();
+                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                    String columnName = rs.getMetaData().getColumnName(i);
+                    for (Field field : fields) {
+                        field.setAccessible(true);
+                        if (field.getName().equals(columnName)) {
+                            Object fieldValue = rs.getObject(i);
+                            field.set(newEntity, fieldValue);
+                            System.out.println(field.getName() + ": " + fieldValue);
+                            break;
+                        }
+                    }
+                }
+                entityList.add(newEntity);
+            }
+        }
+
         return entityList;
     }
+
 }
 

@@ -10,6 +10,9 @@ public class Payment extends Entity<Integer>{
         this.patient_id = patient_id;
     }
 
+    public Payment() {
+    }
+
     public int getPayment_id() {
         return payment_id;
     }
