@@ -15,8 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/patients")
-public class PatientsController<T extends Entity<?>> {
+@RequestMapping("/api/v1/appointments")
+
+public class AppointmentsController<T extends Entity<?>> {
     @Autowired
     private ModelBuid model = new ModelBuid();
 
@@ -29,61 +30,49 @@ public class PatientsController<T extends Entity<?>> {
     public void insert(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException, InstantiationException {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
-        Patients patients = modelMapper.map(requestData, Patients.class);
-        model.insert(patients);
+        Appointments appointments = modelMapper.map(requestData, Appointments.class);
+        model.insert(appointments);
     }
 
     @PutMapping("/update")
     public void update(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
-        Patients patients = modelMapper.map(requestData, Patients.class);
-        model.update(patients);
+        Appointments appointments = modelMapper.map(requestData, Appointments.class);
+        model.update(appointments);
     }
 
     @DeleteMapping("/delete")
-    public String delete( @RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
+    public String delete(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
-        Patients patients = modelMapper.map(requestData, Patients.class);
-        model.delete(patients);
+        Appointments appointments = modelMapper.map(requestData, Appointments.class);
+        model.delete(appointments);
         return "success";
     }
 
     @GetMapping("/list")
     public List<T> list() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-            List<T> list = model.getAll(new Patients().getClass());
-            return list;
+        List<T> list = model.getAll(new Appointments().getClass());
+        return list;
     }
 
     @GetMapping("/getById")
-    public List<Patients> getById(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException, InstantiationException {
-        List<Patients> patientsList = new ArrayList<>();
+    public List<Appointments> getById(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException, InstantiationException {
+        List<Appointments> appointmentsList = new ArrayList<>();
         // Truy vấn danh sách bệnh nhân từ cơ sở dữ liệu với id chỉ định
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
-        Patients patients1 = modelMapper.map(requestData, Patients.class);
-        List<Patients> patients = model.getEntityById(patients1);
-        for (Patients patient : patients) {
-            Patients newPatient = new Patients();
+        Appointments appointments1 = modelMapper.map(requestData, Appointments.class);
+        List<Appointments> appointments = model.getEntityById(appointments1);
+        for (Appointments appointment : appointments) {
+            Appointments newAppoinment = new Appointments();
             // Copy dữ liệu từ patient vào newPatient
-            BeanUtils.copyProperties(patient, newPatient);
-            Payments payment = new Payments();
-            payment.setPatient_id(patient.getPatient_id());
-            List<Payments> payments = model.getEntityById(payment);
-            Medicalrecords medicalrecords = new Medicalrecords();
-            medicalrecords.setPatient_id(patient.getPatient_id());
-            List<Medicalrecords> medicalrecordsList = model.getEntityById(medicalrecords);
-            Appointments appointments = new Appointments();
-            appointments.setPatient_id(patient.getPatient_id());
-            List<Appointments> appointmentsList = model.getEntityById(appointments);
+            BeanUtils.copyProperties(appointment, newAppoinment);
             // Gán danh sách vào các trường list tương ứng với các class
-            newPatient.setPaymentList(payments);
-            newPatient.setMedicalrecordsList(medicalrecordsList);
-            newPatient.setAppointmentsList(appointmentsList);
-            patientsList.add(newPatient);
+            appointmentsList.add(newAppoinment);
         }
-        return patientsList;
+        return appointmentsList;
     }
 
     @PostMapping("/insertAll")

@@ -4,18 +4,18 @@ import java.util.Date;
 import java.util.List;
 
 public class Patients extends Entity<Integer> {
-    private Integer patient_id;
+    private int patient_id;
     private String patient_name;
     private Date patient_dob;
     private String patient_email;
-    private Integer patient_phone;
+    private int patient_phone;
     private String patient_address;
     private String password;
     private String username;
     private List<Appointments> appointmentsList;
     private List<Medicalrecords> medicalrecordsList;
-    private List<Payment> paymentList;
-    public Patients(String patient_name, Date patient_dob, String patient_email, Integer patient_phone, String patient_address, String password, String username) {
+    private List<Payments> paymentsList;
+    public Patients(String patient_name, Date patient_dob, String patient_email, int patient_phone, String patient_address, String password, String username) {
         this.patient_name = patient_name;
         this.patient_dob = patient_dob;
         this.patient_email = patient_email;
@@ -28,7 +28,7 @@ public class Patients extends Entity<Integer> {
     public Patients() {
     }
 
-    public Patients(String patient_name, Date patient_dob, String patient_email, Integer patient_phone, String patient_address, String password, String username, List<Appointments> appointmentsList, List<Medicalrecords> medicalrecordsList) {
+    public Patients(String patient_name, Date patient_dob, String patient_email, int patient_phone, String patient_address, String password, String username, List<Appointments> appointmentsList, List<Medicalrecords> medicalrecordsList) {
         this.patient_name = patient_name;
         this.patient_dob = patient_dob;
         this.patient_email = patient_email;
@@ -40,7 +40,7 @@ public class Patients extends Entity<Integer> {
         this.medicalrecordsList = medicalrecordsList;
     }
 
-    public Patients(String patient_name, Date patient_dob, String patient_email, Integer patient_phone, String patient_address, String password, String username, List<Appointments> appointmentsList, List<Medicalrecords> medicalrecordsList, List<Payment> paymentList) {
+    public Patients(String patient_name, Date patient_dob, String patient_email, int patient_phone, String patient_address, String password, String username, List<Appointments> appointmentsList, List<Medicalrecords> medicalrecordsList, List<Payments> paymentsList) {
         this.patient_name = patient_name;
         this.patient_dob = patient_dob;
         this.patient_email = patient_email;
@@ -50,15 +50,15 @@ public class Patients extends Entity<Integer> {
         this.username = username;
         this.appointmentsList = appointmentsList;
         this.medicalrecordsList = medicalrecordsList;
-        this.paymentList = paymentList;
+        this.paymentsList = paymentsList;
     }
 
-    public List<Payment> getPaymentList() {
-        return paymentList;
+    public List<Payments> getPaymentList() {
+        return paymentsList;
     }
 
-    public void setPaymentList(List<Payment> paymentList) {
-        this.paymentList = paymentList;
+    public void setPaymentList(List<Payments> paymentsList) {
+        this.paymentsList = paymentsList;
     }
 
     public List<Appointments> getAppointmentsList() {
@@ -77,11 +77,11 @@ public class Patients extends Entity<Integer> {
         this.medicalrecordsList = medicalrecordsList;
     }
 
-    public Integer getPatient_id() {
+    public int getPatient_id() {
         return patient_id;
     }
 
-    public void setPatient_id(Integer patient_id) {
+    public void setPatient_id(int patient_id) {
         this.patient_id = patient_id;
     }
 
@@ -109,11 +109,11 @@ public class Patients extends Entity<Integer> {
         this.patient_email = patient_email;
     }
 
-    public Integer getPatient_phone() {
+    public int getPatient_phone() {
         return patient_phone;
     }
 
-    public void setPatient_phone(Integer patient_phone) {
+    public void setPatient_phone(int patient_phone) {
         this.patient_phone = patient_phone;
     }
 
