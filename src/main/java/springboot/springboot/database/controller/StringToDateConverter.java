@@ -12,7 +12,6 @@ public class StringToDateConverter implements Converter<String, Date> {
         if (dateString == null) {
             return null;
         }
-
         // Định dạng chuỗi ngày tháng
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         try {
