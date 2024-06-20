@@ -80,8 +80,16 @@ public class DepartmentsController<T extends Entity<?>> {
     }
 
     @PostMapping("/insertAll")
-    public void insertAll(@RequestBody List<Entity> entities) throws SQLException, IllegalAccessException {
-        model.insertAll(entities);
+    public void insertAll(@RequestBody List<Map<String, Object>> dataList) throws SQLException, IllegalAccessException {
+        List<Departments> departmentsList = new ArrayList<>();
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.addConverter(new StringToDateConverter());
+
+        for (Map<String, Object> data : dataList) {
+            Departments departments = modelMapper.map(data, Departments.class);
+            departmentsList.add(departments);
+        }
+        model.insertAll(departmentsList);
     }
 
     public static Object createElementInstance(Class<?> elementType) throws Exception {

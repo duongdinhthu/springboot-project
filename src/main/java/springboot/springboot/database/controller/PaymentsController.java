@@ -76,8 +76,16 @@ public class PaymentsController<T extends Entity<?>> {
     }
 
     @PostMapping("/insertAll")
-    public void insertAll(@RequestBody List<Entity> entities) throws SQLException, IllegalAccessException {
-        model.insertAll(entities);
+    public void insertAll(@RequestBody List<Map<String, Object>> dataList) throws SQLException, IllegalAccessException {
+        List<Payments> paymentsList = new ArrayList<>();
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.addConverter(new StringToDateConverter());
+
+        for (Map<String, Object> data : dataList) {
+            Payments payments = modelMapper.map(data, Payments.class);
+            paymentsList.add(payments);
+        }
+        model.insertAll(paymentsList);
     }
 
     public static Object createElementInstance(Class<?> elementType) throws Exception {

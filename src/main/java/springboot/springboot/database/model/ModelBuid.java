@@ -243,20 +243,30 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
     @Override
     public void insertAll(List entity) throws SQLException, IllegalAccessException {
         List<Entity> entityList = entity;
-        for (Entity entity1 : entityList) {
-            Field[] fields = entity1.getClass().getDeclaredFields();
-            String query = queryInsert(entity1).toString();
-            System.out.println(query);
-            pstm = openPstm(query);
-            int parameterIndex = 1;
-            for (Field field : fields) {
-                field.setAccessible(true);
-                Object value = field.get(entity1);
-                pstm.setObject(parameterIndex++, value);
+        PreparedStatement pstm = null;
+
+        try {
+            for (Entity entity1 : entityList) {
+                String query = queryInsert(entity1).toString(); // Tạo query insert riêng cho từng phần tử
+                pstm = openPstm(query);
+                System.out.println(query);
+                Field[] fields = entity1.getClass().getDeclaredFields();
+                int parameterIndex = 1;
+                for (Field field : fields) {
+                    field.setAccessible(true);
+                    Object value = field.get(entity1);
+                    if (value != null && !"0".equals(value.toString())) {
+                        pstm.setObject(parameterIndex++, value);
+                    }
+                }
+
+                pstm.executeUpdate(); // Thực hiện insert cho từng phần tử
             }
-            pstm.addBatch();
+        } finally {
+            if (pstm != null) {
+                pstm.close();
+            }
         }
-        pstm.executeUpdate();
     }
 
     @Override
