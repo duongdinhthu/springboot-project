@@ -28,9 +28,17 @@ public class AppointmentsController<T extends Entity<?>> {
 
     @PostMapping("/insert")
     public void insert(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException, InstantiationException {
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.addConverter(new StringToDateConverter());
+        ModelMapper modelMapper = new ModelMapper();//Tạo một đối tượng modelMapper từ lớp ModelMapper,
+        // được sử dụng để thực hiện ánh xạ dữ liệu giữa các đối tượng.
+        modelMapper.addConverter(new StringToDateConverter());// Thêm một Converter mới vào ModelMapper
+        // để chỉ định cách chuyển đổi giữa các kiểu dữ liệu.
+        // Trong trường hợp này, trình chuyển đổi StringToDateConverter
+        // được thêm vào để giúp chuyển đổi dữ liệu từ kiểu String sang kiểu Date khi ánh xạ.
         Appointments appointments = modelMapper.map(requestData, Appointments.class);
+        //Sử dụng ModelMapper để ánh xạ dữ liệu từ đối tượng requestData vào đối tượng Payments.
+        // ModelMapper sẽ tự động ánh xạ các trường dữ liệu tương ứng giữa hai đối tượng dựa trên tên trường
+        // và kiểu dữ liệu của chúng. Trong quá trình ánh xạ, Converter đã được thêm vào trước đó sẽ được sử dụng để
+        // chuyển đổi dữ liệu từ String sang Date (hoặc bất kỳ loại dữ liệu nào mà Converter xử lý).
         model.insert(appointments);
     }
 
