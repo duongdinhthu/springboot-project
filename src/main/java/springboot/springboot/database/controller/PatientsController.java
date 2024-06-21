@@ -68,9 +68,6 @@ public class PatientsController<T extends Entity<?>> {
             Patients newPatient = new Patients();
             // Copy dữ liệu từ patient vào newPatient
             BeanUtils.copyProperties(patient, newPatient);
-            Payments payment = new Payments();
-            payment.setPatient_id(patient.getPatient_id());
-            List<Payments> payments = model.getEntityById(payment);
             Medicalrecords medicalrecords = new Medicalrecords();
             medicalrecords.setPatient_id(patient.getPatient_id());
             List<Medicalrecords> medicalrecordsList = model.getEntityById(medicalrecords);
@@ -78,7 +75,6 @@ public class PatientsController<T extends Entity<?>> {
             appointments.setPatient_id(patient.getPatient_id());
             List<Appointments> appointmentsList = model.getEntityById(appointments);
             // Gán danh sách vào các trường list tương ứng với các class
-            newPatient.setPaymentList(payments);
             newPatient.setMedicalrecordsList(medicalrecordsList);
             newPatient.setAppointmentsList(appointmentsList);
             patientsList.add(newPatient);

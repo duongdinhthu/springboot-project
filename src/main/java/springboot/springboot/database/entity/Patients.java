@@ -14,7 +14,7 @@ public class Patients extends Entity<Integer> {
     private String username;
     private List<Appointments> appointmentsList;
     private List<Medicalrecords> medicalrecordsList;
-    private List<Payments> paymentsList;
+
     public Patients(String patient_name, Date patient_dob, String patient_email, int patient_phone, String patient_address, String password, String username) {
         this.patient_name = patient_name;
         this.patient_dob = patient_dob;
@@ -28,6 +28,7 @@ public class Patients extends Entity<Integer> {
     public Patients() {
     }
 
+
     public Patients(String patient_name, Date patient_dob, String patient_email, int patient_phone, String patient_address, String password, String username, List<Appointments> appointmentsList, List<Medicalrecords> medicalrecordsList) {
         this.patient_name = patient_name;
         this.patient_dob = patient_dob;
@@ -38,28 +39,10 @@ public class Patients extends Entity<Integer> {
         this.username = username;
         this.appointmentsList = appointmentsList;
         this.medicalrecordsList = medicalrecordsList;
+
     }
 
-    public Patients(String patient_name, Date patient_dob, String patient_email, int patient_phone, String patient_address, String password, String username, List<Appointments> appointmentsList, List<Medicalrecords> medicalrecordsList, List<Payments> paymentsList) {
-        this.patient_name = patient_name;
-        this.patient_dob = patient_dob;
-        this.patient_email = patient_email;
-        this.patient_phone = patient_phone;
-        this.patient_address = patient_address;
-        this.password = password;
-        this.username = username;
-        this.appointmentsList = appointmentsList;
-        this.medicalrecordsList = medicalrecordsList;
-        this.paymentsList = paymentsList;
-    }
 
-    public List<Payments> getPaymentList() {
-        return paymentsList;
-    }
-
-    public void setPaymentList(List<Payments> paymentsList) {
-        this.paymentsList = paymentsList;
-    }
 
     public List<Appointments> getAppointmentsList() {
         return appointmentsList;

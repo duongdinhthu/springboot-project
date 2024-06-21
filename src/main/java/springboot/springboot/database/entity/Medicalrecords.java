@@ -2,7 +2,7 @@ package springboot.springboot.database.entity;
 
 import java.util.Date;
 
-public class Medicalrecords extends Entity<Integer>{
+public class Medicalrecords extends Entity<Integer> {
     private int record_id;
     private int patient_id;
     private String symptoms;
@@ -11,11 +11,15 @@ public class Medicalrecords extends Entity<Integer>{
     private String prescription;
     private Date follow_up_date;
     private int doctor_id;
+    private String test_urine;
+    private String test_blood;
+    private String x_ray;
 
     public Medicalrecords() {
     }
 
-    public Medicalrecords(int patient_id, String symptoms, String diagnosis, String treatment, String prescription, Date follow_up_date, int doctor_id) {
+    public Medicalrecords(int record_id, int patient_id, String symptoms, String diagnosis, String treatment, String prescription, Date follow_up_date, int doctor_id, String test_urine, String test_blood, String x_ray) {
+        this.record_id = record_id;
         this.patient_id = patient_id;
         this.symptoms = symptoms;
         this.diagnosis = diagnosis;
@@ -23,6 +27,46 @@ public class Medicalrecords extends Entity<Integer>{
         this.prescription = prescription;
         this.follow_up_date = follow_up_date;
         this.doctor_id = doctor_id;
+        this.test_urine = test_urine;
+        this.test_blood = test_blood;
+        this.x_ray = x_ray;
+    }
+
+    public Medicalrecords(int patient_id, String symptoms, String diagnosis, String treatment, String prescription, Date follow_up_date, int doctor_id, String test_urine, String test_blood, String x_ray) {
+        this.patient_id = patient_id;
+        this.symptoms = symptoms;
+        this.diagnosis = diagnosis;
+        this.treatment = treatment;
+        this.prescription = prescription;
+        this.follow_up_date = follow_up_date;
+        this.doctor_id = doctor_id;
+        this.test_urine = test_urine;
+        this.test_blood = test_blood;
+        this.x_ray = x_ray;
+    }
+
+    public String getTest_urine() {
+        return test_urine;
+    }
+
+    public void setTest_urine(String test_urine) {
+        this.test_urine = test_urine;
+    }
+
+    public String getTest_blood() {
+        return test_blood;
+    }
+
+    public void setTest_blood(String test_blood) {
+        this.test_blood = test_blood;
+    }
+
+    public String getX_ray() {
+        return x_ray;
+    }
+
+    public void setX_ray(String x_ray) {
+        this.x_ray = x_ray;
     }
 
     public int getRecord_id() {

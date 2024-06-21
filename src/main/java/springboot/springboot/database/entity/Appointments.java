@@ -1,5 +1,6 @@
 package springboot.springboot.database.entity;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Appointments extends Entity<Integer>{
@@ -10,27 +11,34 @@ public class Appointments extends Entity<Integer>{
     private Date medical_day;
     private int slot;
     private String status;
-
-    public Appointments(int patient_id, int doctor_id, Date appointment_date, Date medical_day, int slot, String status) {
-        this.patient_id = patient_id;
-        this.doctor_id = doctor_id;
-        this.appointment_date = appointment_date;
-        this.medical_day = medical_day;
-        this.slot = slot;
-        this.status = status;
-    }
-
+    private String payment_name;
+    private BigDecimal price;
+    private int staff_id;
     public Appointments() {
     }
 
-    public Appointments(int appointment_id, int patient_id, int doctor_id, Date appointment_date, Date medical_day, int slot, String status) {
-        this.appointment_id = appointment_id;
-        this.patient_id = patient_id;
-        this.doctor_id = doctor_id;
-        this.appointment_date = appointment_date;
-        this.medical_day = medical_day;
-        this.slot = slot;
-        this.status = status;
+    public String getPayment_name() {
+        return payment_name;
+    }
+
+    public void setPayment_name(String payment_name) {
+        this.payment_name = payment_name;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public int getStaff_id() {
+        return staff_id;
+    }
+
+    public void setStaff_id(int staff_id) {
+        this.staff_id = staff_id;
     }
 
     public int getAppointment_id() {
