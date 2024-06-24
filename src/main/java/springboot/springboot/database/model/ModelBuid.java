@@ -405,6 +405,102 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
 
         return entityList;
     }
+    public List<Entity> getEntityListById(List<Entity> listObject) throws SQLException {
+        List<Entity> entityList = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
 
+        try {
+            conn = openConnection(); // Lấy kết nối tới cơ sở dữ liệu
+
+            for (Entity entity : listObject) {
+                String query = queryGetEntityById(entity).toString();
+                System.out.println(query);
+                pstm = conn.prepareStatement(query);
+
+                Field[] fields = entity.getClass().getDeclaredFields();
+                List<Field> validFields = new ArrayList<>();
+
+                for (Field f : fields) {
+                    f.setAccessible(true);
+                    Object val = f.get(entity);
+                    if (val != null && !"0".equals(val.toString())) {
+                        validFields.add(f);
+                    }
+                }
+
+                int index = 1;
+                for (Field f : validFields) {
+                    Object val = f.get(entity);
+                    pstm.setObject(index, val);
+                    index++;
+                }
+
+                rs = pstm.executeQuery();
+
+                List<Entity> tempEntityList = new ArrayList<>(); // Tạo một list tạm để lưu trữ entity mới
+
+                while (rs.next()) {
+                    Entity newEntity = entity.getClass().getDeclaredConstructor().newInstance();
+                    for (Field field : fields) {
+                        field.setAccessible(true);
+                        String columnName = field.getName();
+                        Object fieldValue = rs.getObject(columnName);
+
+                        if (fieldValue != null) {
+                            field.set(newEntity, fieldValue);
+                            System.out.println(columnName + ": " + fieldValue);
+                        }
+                    }
+                    tempEntityList.add(newEntity);
+                }
+
+                entityList.addAll(tempEntityList); // Thêm tất cả entity mới vào entityList sau khi xử lý ResultSet
+            }
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            // Xử lý ngoại lệ khi tạo mới Entity không thành công
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (pstm != null) {
+                pstm.close();
+            }
+            if (conn != null) {
+                conn.close(); // Đóng kết nối
+            }
+        }
+
+        return entityList;
+    }
+    public void insertAll1(List<Entity> objectList) throws SQLException, IllegalAccessException {
+        PreparedStatement pstm = null;
+
+        try {
+            for (Entity entity : objectList) {
+                String query = queryInsert(entity).toString(); // Tạo query insert riêng cho từng phần tử
+                pstm = openPstm(query);
+                System.out.println(query);
+                Field[] fields = entity.getClass().getDeclaredFields();
+                int parameterIndex = 1;
+                for (Field field : fields) {
+                    field.setAccessible(true);
+                    Object value = field.get(entity);
+                    if (value != null && !"0".equals(value.toString())) {
+                        pstm.setObject(parameterIndex++, value);
+                    }
+                }
+
+
+            }
+            pstm.executeUpdate(); // Thực hiện insert cho từng phần tử
+        } finally {
+            if (pstm != null) {
+                pstm.close();
+            }
+        }
+    }
 }
 
