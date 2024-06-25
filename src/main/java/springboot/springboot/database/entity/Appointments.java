@@ -2,6 +2,7 @@ package springboot.springboot.database.entity;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class Appointments extends Entity<Integer>{
     private int appointment_id;
@@ -14,7 +15,34 @@ public class Appointments extends Entity<Integer>{
     private String payment_name;
     private BigDecimal price;
     private int staff_id;
+    private List<Patients> patient;
+    private List<Doctors> doctor;
+    private List<Staffs> staff;
     public Appointments() {
+    }
+
+    public List<Patients> getPatient() {
+        return patient;
+    }
+
+    public void setPatient(List<Patients> patient) {
+        this.patient = patient;
+    }
+
+    public List<Doctors> getDoctor() {
+        return doctor;
+    }
+
+    public void setDoctor(List<Doctors> doctor) {
+        this.doctor = doctor;
+    }
+
+    public List<Staffs> getStaff() {
+        return staff;
+    }
+
+    public void setStaff(List<Staffs> staff) {
+        this.staff = staff;
     }
 
     public String getPayment_name() {

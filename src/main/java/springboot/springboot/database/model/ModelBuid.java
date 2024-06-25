@@ -363,7 +363,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         List<T> entityList = new ArrayList<>(); // Khai báo và khởi tạo entityList
 
         String query = queryGetEntityById(entity).toString();
-        System.out.println(query);
+
         openPstm(query);
 
         Field[] fields = entity.getClass().getDeclaredFields();
@@ -394,7 +394,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
                     if (field.getName().equals(columnName)) {
                         Object fieldValue = rs.getObject(i);
                         field.set(newEntity, fieldValue);
-                        System.out.println(field.getName() + ": " + fieldValue);
+
                         break;
                     }
                 }
@@ -404,6 +404,50 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
 
 
         return entityList;
+    }
+
+    public T getManyToOne(Entity entity) throws SQLException, IllegalAccessException, InstantiationException {
+        String query = queryGetEntityById(entity).toString();
+        System.out.println(query);
+        openPstm(query);
+
+        Field[] fields = entity.getClass().getDeclaredFields();
+        List<Field> validFields = new ArrayList<>();
+
+        for (Field f : fields) {
+            f.setAccessible(true);
+            Object val = f.get(entity);
+            if (val != null && !"0".equals(val.toString())) {
+                validFields.add(f);
+            }
+        }
+
+        int index = 1;
+        for (Field f : validFields) {
+            Object val = f.get(entity);
+            pstm.setObject(index, val);
+            index++;
+        }
+        ResultSet rs = exQuery();
+
+        T newEntity = null;
+        if (rs.next()) {
+            newEntity = (T) entity.getClass().newInstance();
+            for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                String columnName = rs.getMetaData().getColumnName(i);
+                for (Field field : fields) {
+                    field.setAccessible(true);
+                    if (field.getName().equals(columnName)) {
+                        Object fieldValue = rs.getObject(i);
+                        field.set(newEntity, fieldValue);
+                        System.out.println(field.getName() + ": " + fieldValue);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return newEntity;
     }
     public List<Entity> getEntityListById(List<Entity> listObject) throws SQLException {
         List<Entity> entityList = new ArrayList<>();
@@ -448,7 +492,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
                         String columnName = field.getName();
                         Object fieldValue = rs.getObject(columnName);
 
-                        if (fieldValue != null) {
+                        if (fieldValue != null&&!"0".equals(fieldValue.toString())) {
                             field.set(newEntity, fieldValue);
                             System.out.println(columnName + ": " + fieldValue);
                         }

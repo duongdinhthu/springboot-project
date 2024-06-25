@@ -1,6 +1,7 @@
 package springboot.springboot.database.entity;
 
 import java.util.Date;
+import java.util.List;
 
 public class Medicalrecords extends Entity<Integer> {
     private int record_id;
@@ -14,35 +15,30 @@ public class Medicalrecords extends Entity<Integer> {
     private String test_urine;
     private String test_blood;
     private String x_ray;
+    private List<Patients> patients;
+    private List<Doctors> doctors;
+
+    public Medicalrecords(int patient_id) {
+        this.patient_id = patient_id;
+    }
+
+    public List<Patients> getPatients() {
+        return patients;
+    }
+
+    public void setPatients(List<Patients> patients) {
+        this.patients = patients;
+    }
+
+    public List<Doctors> getDoctors() {
+        return doctors;
+    }
+
+    public void setDoctors(List<Doctors> doctors) {
+        this.doctors = doctors;
+    }
 
     public Medicalrecords() {
-    }
-
-    public Medicalrecords(int record_id, int patient_id, String symptoms, String diagnosis, String treatment, String prescription, Date follow_up_date, int doctor_id, String test_urine, String test_blood, String x_ray) {
-        this.record_id = record_id;
-        this.patient_id = patient_id;
-        this.symptoms = symptoms;
-        this.diagnosis = diagnosis;
-        this.treatment = treatment;
-        this.prescription = prescription;
-        this.follow_up_date = follow_up_date;
-        this.doctor_id = doctor_id;
-        this.test_urine = test_urine;
-        this.test_blood = test_blood;
-        this.x_ray = x_ray;
-    }
-
-    public Medicalrecords(int patient_id, String symptoms, String diagnosis, String treatment, String prescription, Date follow_up_date, int doctor_id, String test_urine, String test_blood, String x_ray) {
-        this.patient_id = patient_id;
-        this.symptoms = symptoms;
-        this.diagnosis = diagnosis;
-        this.treatment = treatment;
-        this.prescription = prescription;
-        this.follow_up_date = follow_up_date;
-        this.doctor_id = doctor_id;
-        this.test_urine = test_urine;
-        this.test_blood = test_blood;
-        this.x_ray = x_ray;
     }
 
     public String getTest_urine() {

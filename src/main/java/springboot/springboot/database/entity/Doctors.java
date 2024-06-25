@@ -11,6 +11,7 @@ public class Doctors extends Entity<Integer> {
     private int department_id;
     private String username;
     private String password;
+    private List<Departments> department;
     private List<Appointments> appointmentsList;
     private List<Medicalrecords> medicalrecordsList;
     public Doctors(String doctor_name, int doctor_phone, String doctor_address, String doctor_email, int department_id, String username, String password) {
@@ -59,6 +60,15 @@ public class Doctors extends Entity<Integer> {
         this.password = password;
         this.appointmentsList = appointmentsList;
         this.medicalrecordsList = medicalrecordsList;
+    }
+
+
+    public List<Departments> getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(List<Departments> department) {
+        this.department = department;
     }
 
     public List<Appointments> getAppointmentsList() {

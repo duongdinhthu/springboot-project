@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springboot.springboot.database.entity.*;
+import springboot.springboot.database.model.EntityToJSON;
 import springboot.springboot.database.model.ModelBuid;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -18,6 +19,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/departments")
 
 public class DepartmentsController<T extends Entity<?>> {
+    private EntityToJSON json = new EntityToJSON();
     @Autowired
     private ModelBuid model = new ModelBuid();
 
@@ -71,9 +73,8 @@ public class DepartmentsController<T extends Entity<?>> {
             BeanUtils.copyProperties(department, newDepartment);
             Doctors doctors = new Doctors();
             doctors.setDepartment_id(department.getDepartment_id());
-            List<Doctors> doctorsList = model.getEntityById(doctors);
             // Gán danh sách vào các trường list tương ứng với các class
-            newDepartment.setDoctorsList(doctorsList);
+            newDepartment.setDoctorsList(model.getEntityById(doctors));
             departmentsList.add(newDepartment);
         }
         return departmentsList;

@@ -25,6 +25,7 @@ public class Patients extends Entity<Integer> {
         this.username = username;
     }
 
+
     public Patients() {
     }
 

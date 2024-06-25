@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springboot.springboot.database.entity.*;
+import springboot.springboot.database.model.EntityToJSON;
 import springboot.springboot.database.model.ModelBuid;
 
 
@@ -23,6 +24,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/doctors")
 public class DoctorsController<T extends Entity<?>> {
+    private EntityToJSON json = new EntityToJSON();
     @Autowired
     private ModelBuid model = new ModelBuid();
     @PostMapping("/insert")
@@ -70,12 +72,13 @@ public class DoctorsController<T extends Entity<?>> {
             BeanUtils.copyProperties(doctor, newdoctor);
             Medicalrecords medicalrecords = new Medicalrecords();
             medicalrecords.setDoctor_id(doctor.getDoctor_id());
-            List<Medicalrecords> medicalrecordsList = model.getEntityById(medicalrecords);
             Appointments appointment = new Appointments();
             appointment.setDoctor_id(doctor.getDoctor_id());
-            List<Appointments> appointmentsList = model.getEntityById(appointment);
-            newdoctor.setMedicalrecordsList(medicalrecordsList);
-            newdoctor.setAppointmentsList(appointmentsList);
+            Departments departments = new Departments();
+            departments.setDepartment_id(doctor.getDepartment_id());
+            newdoctor.setMedicalrecordsList(model.getEntityById(medicalrecords));
+            newdoctor.setAppointmentsList(model.getEntityById(appointment));
+            newdoctor.setDepartment(model.getEntityById(departments));
             doctorsList.add(newdoctor);
         }
         return doctorsList;

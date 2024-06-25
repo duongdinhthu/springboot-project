@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springboot.springboot.database.entity.*;
+import springboot.springboot.database.model.EntityToJSON;
 import springboot.springboot.database.model.ModelBuid;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -16,6 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/medicalrecords")
 public class MedicalrecordsController<T extends Entity<?>>{
+    private EntityToJSON json = new EntityToJSON();
     @Autowired
     private ModelBuid model = new ModelBuid();
 
@@ -67,6 +69,12 @@ public class MedicalrecordsController<T extends Entity<?>>{
             Medicalrecords newMedicalrecord = new Medicalrecords();
             // Copy dữ liệu từ patient vào newPatient
             BeanUtils.copyProperties(medicalrecord, newMedicalrecord);
+            Patients patients = new Patients();
+            patients.setId(medicalrecord.getPatient_id());
+            newMedicalrecord.setPatients(model.getEntityById(patients));
+            Doctors doctors = new Doctors();
+            doctors.setId(medicalrecord.getDoctor_id());
+            newMedicalrecord.setDoctors(model.getEntityById(doctors));
             // Gán danh sách vào các trường list tương ứng với các class
             medicalrecordsList.add(newMedicalrecord);
         }
