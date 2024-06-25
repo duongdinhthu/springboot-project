@@ -89,7 +89,6 @@ public class AppointmentsController<T extends Entity<?>> {
             Patients patients = new Patients();
             patients.setPatient_id(appointment.getPatient_id());
             newAppoinment.setPatient(model.getEntityById(patients));
-
             appointmentsList.add(newAppoinment);
         }
         return appointmentsList;
@@ -107,7 +106,6 @@ public class AppointmentsController<T extends Entity<?>> {
         }
         model.insertAll(appointmentsList);
     }
-
     public static Object createElementInstance(Class<?> elementType) throws Exception {
         // Kiểm tra xem lớp cụ thể có constructor mặc định không
         Constructor<?> constructor = elementType.getConstructor();

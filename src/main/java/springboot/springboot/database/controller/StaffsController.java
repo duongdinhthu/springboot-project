@@ -68,12 +68,12 @@ public class StaffsController<T extends Entity<?>>{
         List<Staffs> staffs = model.getEntityById(staffs1);
         for (Staffs staff : staffs) {
             Staffs newStaff = new Staffs();
-            // Copy dữ liệu từ patient vào newPatient
             BeanUtils.copyProperties(staff, newStaff);
-            Appointments appointments = new Appointments();
-            appointments.setStaff_id(staff.getStaff_id());
-            // Gán danh sách vào các trường list tương ứng với các class
-            newStaff.setAppointmentsList(model.getEntityById(appointments));
+            Appointments appointmentsFilter = new Appointments();
+            appointmentsFilter.setStaff_id(staff.getStaff_id());
+            List<Appointments> appointmentsList = model.getEntityById(appointmentsFilter);
+            List<Appointments> appointments = appointmentsList(appointmentsList);
+            newStaff.setAppointmentsList(appointments);
             staffsList.add(newStaff);
         }
         json.writeEmployeeToJson(staffsList, staffs.getClass(), "getbyfields");
@@ -97,5 +97,48 @@ public class StaffsController<T extends Entity<?>>{
         Constructor<?> constructor = elementType.getConstructor();
         // Tạo một đối tượng mới thông qua constructor mặc định của lớp cụ thể
         return constructor.newInstance();
+    }
+    public List<Doctors> doctorsList(List<Doctors> doctorsList) throws SQLException, IllegalAccessException, InstantiationException {
+        List<Doctors> doctors = new ArrayList<>();
+        for (Doctors doctor : doctorsList) {
+            Doctors newDoctor = new Doctors();
+            BeanUtils.copyProperties(doctor, newDoctor);
+            Departments departmentsFilter = new Departments();
+            departmentsFilter.setDepartment_id(doctor.getDepartment_id());
+            newDoctor.setDepartment(model.getEntityById(departmentsFilter));
+            doctors.add(newDoctor);
+        }
+        return doctors;
+    }
+    public List<Patients> patientsList(List<Patients> patientsList) throws SQLException, IllegalAccessException, InstantiationException {
+        List<Patients> patients = new ArrayList<>();
+        for (Patients patient : patientsList) {
+            Patients newPatient = new Patients();
+            BeanUtils.copyProperties(patient, newPatient);
+            Medicalrecords medicalrecordsFilter = new Medicalrecords();
+            medicalrecordsFilter.setPatient_id(patient.getPatient_id());
+            newPatient.setMedicalrecordsList(model.getEntityById(medicalrecordsFilter));
+            patients.add(newPatient);
+        }
+        return patients;
+    }
+    public List<Appointments> appointmentsList(List<Appointments> appointmentsList) throws SQLException, IllegalAccessException, InstantiationException {
+        List<Appointments> appointments = new ArrayList<>();
+        for (Appointments appointment : appointmentsList) {
+            Appointments newAppointment = new Appointments();
+            BeanUtils.copyProperties(appointment, newAppointment);
+            Doctors doctorsFilter = new Doctors();
+            doctorsFilter.setDoctor_id(appointment.getDoctor_id());
+            List<Doctors> doctorsList = model.getEntityById(doctorsFilter);
+            List<Doctors>doctors = doctorsList(doctorsList);
+            newAppointment.setDoctor(doctors);
+            appointments.add(newAppointment);
+            Patients patientsFilter = new Patients();
+            patientsFilter.setPatient_id(appointment.getPatient_id());
+            List<Patients> patientsList = model.getEntityById(patientsFilter);
+            List<Patients> patients = patientsList(patientsList);
+            newAppointment.setPatient(patients);
+        }
+        return appointments;
     }
 }
