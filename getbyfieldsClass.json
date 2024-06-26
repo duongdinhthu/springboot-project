@@ -1,7 +1,9 @@
 [
   {
-    "staff_id": 1,
-    "staff_phone": 345345,
+    "patient_id": 1,
+    "patient_email": "duongthutb94@gmail.com",
+    "patient_phone": 981300594,
+    "patient_username": "duongthu",
     "appointmentsList": [
       {
         "appointment_id": 1,
@@ -12,36 +14,6 @@
         "slot": 2,
         "status": "pending",
         "staff_id": 1,
-        "patient": [
-          {
-            "patient_id": 1,
-            "patient_email": "duongthutb94@gmail.com",
-            "patient_phone": 981300594,
-            "username": "duongthu",
-            "medicalrecordsList": [
-              {
-                "record_id": 1,
-                "patient_id": 1,
-                "symptoms": "gay tay",
-                "diagnosis": "gay tay",
-                "treatment": "bo bot",
-                "prescription": "khong",
-                "follow_up_date": "Jan 2, 2024",
-                "doctor_id": 1
-              },
-              {
-                "record_id": 2,
-                "patient_id": 1,
-                "symptoms": "dau bung",
-                "diagnosis": "dau bung",
-                "treatment": "bebary",
-                "prescription": "ok",
-                "follow_up_date": "Jan 1, 2025",
-                "doctor_id": 1
-              }
-            ]
-          }
-        ],
         "doctor": [
           {
             "doctor_id": 1,
@@ -50,8 +22,8 @@
             "doctor_address": "Thai Binh",
             "doctor_email": "duongthutb94@gmail.com",
             "department_id": 1,
-            "username": "duongthu",
-            "password": "thu456258",
+            "doctor_username": "duongthu",
+            "doctor_password": "thu456258",
             "department": [
               {
                 "department_id": 1,
@@ -59,6 +31,12 @@
                 "location": "Tang 1"
               }
             ]
+          }
+        ],
+        "staff": [
+          {
+            "staff_id": 1,
+            "staff_phone": 345345
           }
         ]
       },
@@ -71,36 +49,6 @@
         "slot": 1,
         "status": "pending",
         "staff_id": 1,
-        "patient": [
-          {
-            "patient_id": 1,
-            "patient_email": "duongthutb94@gmail.com",
-            "patient_phone": 981300594,
-            "username": "duongthu",
-            "medicalrecordsList": [
-              {
-                "record_id": 1,
-                "patient_id": 1,
-                "symptoms": "gay tay",
-                "diagnosis": "gay tay",
-                "treatment": "bo bot",
-                "prescription": "khong",
-                "follow_up_date": "Jan 2, 2024",
-                "doctor_id": 1
-              },
-              {
-                "record_id": 2,
-                "patient_id": 1,
-                "symptoms": "dau bung",
-                "diagnosis": "dau bung",
-                "treatment": "bebary",
-                "prescription": "ok",
-                "follow_up_date": "Jan 1, 2025",
-                "doctor_id": 1
-              }
-            ]
-          }
-        ],
         "doctor": [
           {
             "doctor_id": 1,
@@ -109,64 +57,67 @@
             "doctor_address": "Thai Binh",
             "doctor_email": "duongthutb94@gmail.com",
             "department_id": 1,
-            "username": "duongthu",
-            "password": "thu456258",
+            "doctor_username": "duongthu",
+            "doctor_password": "thu456258",
             "department": [
               {
                 "department_id": 1,
                 "department_name": "Chan Thuong",
                 "location": "Tang 1"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "appointment_id": 3,
-        "patient_id": 3,
-        "doctor_id": 26,
-        "appointment_date": "Jan 1, 2025",
-        "medical_day": "Feb 1, 2025",
-        "slot": 1,
-        "status": "pending",
-        "staff_id": 1,
-        "patient": [
-          {
-            "patient_id": 3,
-            "patient_name": "áda",
-            "patient_dob": "Jun 19, 2024",
-            "patient_email": "dfdg",
-            "patient_phone": 481300594,
-            "password": "sad",
-            "username": "duongthudg",
-            "medicalrecordsList": [
-              {
-                "record_id": 3,
-                "patient_id": 3,
-                "symptoms": "dau bung",
-                "diagnosis": "dau bung",
-                "treatment": "bebary",
-                "prescription": "ok",
-                "follow_up_date": "Jan 1, 2025",
-                "doctor_id": 1
               }
             ]
           }
         ],
-        "doctor": [
+        "staff": [
           {
-            "doctor_id": 26,
-            "doctor_name": "duonhudgav",
-            "doctor_phone": 43534534,
-            "doctor_address": "duonhudg",
+            "staff_id": 1,
+            "staff_phone": 345345
+          }
+        ]
+      }
+    ],
+    "medicalrecordsList": [
+      {
+        "record_id": 1,
+        "patient_id": 1,
+        "symptoms": "gay tay",
+        "diagnosis": "gay tay",
+        "treatment": "bo bot",
+        "prescription": "khong",
+        "follow_up_date": "Jan 2, 2024",
+        "doctor_id": 1,
+        "doctors": [
+          {
+            "doctor_id": 1,
+            "doctor_name": "Duong dinh thu",
+            "doctor_phone": 981300594,
+            "doctor_address": "Thai Binh",
+            "doctor_email": "duongthutb94@gmail.com",
             "department_id": 1,
-            "department": [
-              {
-                "department_id": 1,
-                "department_name": "Chan Thuong",
-                "location": "Tang 1"
-              }
-            ]
+            "doctor_username": "duongthu",
+            "doctor_password": "thu456258"
+          }
+        ]
+      },
+      {
+        "record_id": 2,
+        "patient_id": 1,
+        "symptoms": "dau bung",
+        "diagnosis": "dau bung",
+        "treatment": "bebary",
+        "prescription": "ok",
+        "follow_up_date": "Jan 1, 2025",
+        "doctor_id": 1,
+        "doctors": [
+          {
+            "doctor_id": 1,
+            "doctor_name": "Duong dinh thu",
+            "doctor_phone": 981300594,
+            "doctor_address": "Thai Binh",
+            "doctor_email": "duongthutb94@gmail.com",
+            "department_id": 1,
+            "doctor_username": "duongthu",
+            "doctor_password": "thu456258"
           }
         ]
       }

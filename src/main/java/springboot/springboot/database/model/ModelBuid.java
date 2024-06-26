@@ -1,6 +1,11 @@
 package springboot.springboot.database.model;
 
-
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ConfigurationBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.reflections.Reflections;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import springboot.springboot.database.connectDTB.MySqlConnect;
 import springboot.springboot.database.entity.Entity;
@@ -13,6 +18,9 @@ import java.util.*;
 
 @Component
 public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     private List<T> entities = new ArrayList<>();// T dai dien cho cac thuc the entity( Product, Customer....)
     public static Connection connection;
 
@@ -170,7 +178,42 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         }
         return query;
     }
+    public List<Entity> executeQueryGetAll(Entity entity) throws IllegalAccessException {
+        StringBuilder query = queryGetAll(entity);
+        Object[] params = extractParams(entity);
 
+        return jdbcTemplate.query(query.toString(), params, new RowMapper<Entity>() {
+            @Override
+            public Entity mapRow(ResultSet rs, int rowNum) throws SQLException {
+                try {
+                    Entity resultEntity = entity.getClass().newInstance();
+                    Field[] fields = entity.getClass().getDeclaredFields();
+                    for (Field field : fields) {
+                        field.setAccessible(true);
+                        field.set(resultEntity, rs.getObject(field.getName()));
+                    }
+                    return resultEntity;
+                } catch (InstantiationException | IllegalAccessException e) {
+                    throw new SQLException("Error mapping row to entity", e);
+                }
+            }
+        });
+    }
+
+    private Object[] extractParams(Entity entity) throws IllegalAccessException {
+        List<Object> params = new ArrayList<>();
+        Field[] fields = entity.getClass().getDeclaredFields();
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+            Object value = field.get(entity);
+            if (value != null && !"0".equals(value.toString())) {
+                params.add(value);
+            }
+        }
+
+        return params.toArray();
+    }
     private StringBuilder queryGetAll(Class<T> entityClass) {
         String tableName = getTableName(entityClass);
         StringBuilder query = new StringBuilder("select * from ");
@@ -178,6 +221,152 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         return query;
     }
 
+    private String extractTableName(Class<?> clazz) {
+        return clazz.getSimpleName().toLowerCase();
+    }
+
+    private Set<Class<? extends Entity>> getAllEntitySubclasses() {
+        Reflections reflections = new Reflections(
+                new ConfigurationBuilder()
+                        .forPackages("springboot.springboot.database.entity") // Replace with your package name
+                        .addScanners(new SubTypesScanner(false))
+        );
+        return reflections.getSubTypesOf(Entity.class);
+    }
+
+    public StringBuilder queryGetAll(Entity entity) throws IllegalAccessException {
+        StringBuilder query = new StringBuilder("SELECT * FROM ");
+
+        // Get all subclasses of Entity
+        Set<Class<? extends Entity>> entityClasses = getAllEntitySubclasses();
+        Map<String, Set<Field>> tableFieldMap = new HashMap<>();
+
+        // Map table names to their fields
+        for (Class<? extends Entity> entityClass : entityClasses) {
+            String tableName = extractTableName(entityClass);
+            Set<Field> fields = new HashSet<>();
+            for (Field field : entityClass.getDeclaredFields()) {
+                fields.add(field);
+            }
+            tableFieldMap.put(tableName, fields);
+        }
+
+        // Create join part of the query
+        boolean firstTable = true;
+        String previousTableName = null;
+        for (String tableName : tableFieldMap.keySet()) {
+            if (!firstTable) {
+                query.append(" JOIN ").append(tableName).append(" ").append(tableName.substring(0, 1));
+                // Find common fields between the current and previous table for join condition
+                String joinCondition = findJoinCondition(tableFieldMap, previousTableName, tableName, new HashSet<>());
+                if (joinCondition != null) {
+                    query.append(" ON ").append(joinCondition);
+                } else {
+                    throw new IllegalStateException("No join condition found between " + previousTableName + " and " + tableName);
+                }
+            } else {
+                query.append(tableName).append(" ").append(tableName.substring(0, 1));
+                firstTable = false;
+            }
+            previousTableName = tableName;
+        }
+
+        // Append the WHERE clause
+        Field[] fields = entity.getClass().getDeclaredFields();
+        boolean foundField = false;
+        for (Field field : fields) {
+            field.setAccessible(true);
+            Object value = field.get(entity);
+            if (value != null && !"0".equals(value.toString())) {
+                if (!foundField) {
+                    query.append(" WHERE ");
+                    foundField = true;
+                } else {
+                    query.append(" AND ");
+                }
+                String tableName = extractTableName(entity.getClass());
+                query.append(tableName).append(".").append(field.getName()).append(" = ?");
+            }
+        }
+
+        System.out.println(query.toString());
+        return query;
+    }
+
+
+    private String findJoinCondition(Map<String, Set<Field>> tableFieldMap, String table1, String table2, Set<String> visitedTables) {
+        visitedTables.add(table1);
+
+        String directJoinCondition = getJoinCondition(tableFieldMap, table1, table2);
+        if (directJoinCondition != null) {
+            return directJoinCondition;
+        }
+
+        for (String intermediateTable : tableFieldMap.keySet()) {
+            if (!visitedTables.contains(intermediateTable)) {
+                String joinCondition1 = getJoinCondition(tableFieldMap, table1, intermediateTable);
+                String joinCondition2 = getJoinCondition(tableFieldMap, intermediateTable, table2);
+                if (joinCondition1 != null && joinCondition2 != null) {
+                    return joinCondition1 + " AND " + joinCondition2;
+                } else {
+                    String recursiveJoinCondition = findJoinCondition(tableFieldMap, intermediateTable, table2, visitedTables);
+                    if (recursiveJoinCondition != null) {
+                        if (joinCondition1 != null) {
+                            return joinCondition1 + " AND " + recursiveJoinCondition;
+                        } else {
+                            return recursiveJoinCondition;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private String getJoinCondition(Map<String, Set<Field>> tableFieldMap, String table1, String table2) {
+        Set<Field> fieldsTable1 = tableFieldMap.get(table1);
+        Set<Field> fieldsTable2 = tableFieldMap.get(table2);
+
+        for (Field field1 : fieldsTable1) {
+            for (Field field2 : fieldsTable2) {
+                if (field1.getName().equals(field2.getName()) && field1.getType().equals(field2.getType()) && field1.getType().equals(int.class)) {
+                    return table1 + "." + field1.getName() + " = " + table2 + "." + field2.getName();
+                }
+            }
+        }
+
+        return null; // No common field found for join
+    }
+
+
+    public List<Entity> executeQuery(String query, Entity entity) throws SQLException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+        List<Entity> entities = new ArrayList<>();
+        jdbcTemplate.query(query, rs -> {
+            Entity resultEntity = null;
+            try {
+                resultEntity = entity.getClass().getDeclaredConstructor().newInstance();
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+            for (Field field : entity.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                try {
+                    field.set(resultEntity, rs.getObject(field.getName()));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            entities.add(resultEntity);
+        });
+        return entities;
+    }
     private StringBuilder queryGetEntityById(Entity entity) {
         String tableName = getTableName((Class<T>) entity.getClass());
         StringBuilder query = new StringBuilder("select * from ");
@@ -363,7 +552,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         List<T> entityList = new ArrayList<>(); // Khai báo và khởi tạo entityList
 
         String query = queryGetEntityById(entity).toString();
-
+        System.out.println(query);
         openPstm(query);
 
         Field[] fields = entity.getClass().getDeclaredFields();

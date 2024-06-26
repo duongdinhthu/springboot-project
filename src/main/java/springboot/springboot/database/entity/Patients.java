@@ -10,38 +10,19 @@ public class Patients extends Entity<Integer> {
     private String patient_email;
     private int patient_phone;
     private String patient_address;
-    private String password;
-    private String username;
+    private String patient_password;
+    private String patient_username;
     private List<Appointments> appointmentsList;
     private List<Medicalrecords> medicalrecordsList;
 
-    public Patients(String patient_name, Date patient_dob, String patient_email, int patient_phone, String patient_address, String password, String username) {
-        this.patient_name = patient_name;
-        this.patient_dob = patient_dob;
-        this.patient_email = patient_email;
-        this.patient_phone = patient_phone;
-        this.patient_address = patient_address;
-        this.password = password;
-        this.username = username;
-    }
+
 
 
     public Patients() {
     }
 
 
-    public Patients(String patient_name, Date patient_dob, String patient_email, int patient_phone, String patient_address, String password, String username, List<Appointments> appointmentsList, List<Medicalrecords> medicalrecordsList) {
-        this.patient_name = patient_name;
-        this.patient_dob = patient_dob;
-        this.patient_email = patient_email;
-        this.patient_phone = patient_phone;
-        this.patient_address = patient_address;
-        this.password = password;
-        this.username = username;
-        this.appointmentsList = appointmentsList;
-        this.medicalrecordsList = medicalrecordsList;
 
-    }
 
 
 
@@ -109,19 +90,19 @@ public class Patients extends Entity<Integer> {
         this.patient_address = patient_address;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPatient_password() {
+        return patient_password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPatient_password(String patient_password) {
+        this.patient_password = patient_password;
     }
 
-    public String getUsername() {
-        return username;
+    public String getPatient_username() {
+        return patient_username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setPatient_username(String patient_username) {
+        this.patient_username = patient_username;
     }
 }

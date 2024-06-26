@@ -9,58 +9,21 @@ public class Doctors extends Entity<Integer> {
     private String doctor_address;
     private String doctor_email;
     private int department_id;
-    private String username;
-    private String password;
+    private String doctor_username;
+    private String doctor_password;
     private List<Departments> department;
     private List<Appointments> appointmentsList;
     private List<Medicalrecords> medicalrecordsList;
-    public Doctors(String doctor_name, int doctor_phone, String doctor_address, String doctor_email, int department_id, String username, String password) {
-        this.doctor_name = doctor_name;
-        this.doctor_phone = doctor_phone;
-        this.doctor_address = doctor_address;
-        this.doctor_email = doctor_email;
-        this.department_id = department_id;
-        this.username = username;
-        this.password = password;
-    }
+
 
     public Doctors() {
     }
 
-    public Doctors(String doctor_name, int doctor_phone, String doctor_address, String doctor_email, int department_id, String username, String password, List<Medicalrecords> medicalrecordsList) {
-        this.doctor_name = doctor_name;
-        this.doctor_phone = doctor_phone;
-        this.doctor_address = doctor_address;
-        this.doctor_email = doctor_email;
-        this.department_id = department_id;
-        this.username = username;
-        this.password = password;
-        this.medicalrecordsList = medicalrecordsList;
-    }
 
-    public Doctors(int doctor_id, String doctor_name, int doctor_phone, String doctor_address, String doctor_email, int department_id, String username, String password, List<Appointments> appointmentsList) {
-        this.doctor_id = doctor_id;
-        this.doctor_name = doctor_name;
-        this.doctor_phone = doctor_phone;
-        this.doctor_address = doctor_address;
-        this.doctor_email = doctor_email;
-        this.department_id = department_id;
-        this.username = username;
-        this.password = password;
-        this.appointmentsList = appointmentsList;
-    }
 
-    public Doctors(String doctor_name, int doctor_phone, String doctor_address, String doctor_email, int department_id, String username, String password, List<Appointments> appointmentsList, List<Medicalrecords> medicalrecordsList) {
-        this.doctor_name = doctor_name;
-        this.doctor_phone = doctor_phone;
-        this.doctor_address = doctor_address;
-        this.doctor_email = doctor_email;
-        this.department_id = department_id;
-        this.username = username;
-        this.password = password;
-        this.appointmentsList = appointmentsList;
-        this.medicalrecordsList = medicalrecordsList;
-    }
+
+
+
 
 
     public List<Departments> getDepartment() {
@@ -135,19 +98,19 @@ public class Doctors extends Entity<Integer> {
         this.department_id = department_id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getDoctor_username() {
+        return doctor_username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setDoctor_username(String doctor_username) {
+        this.doctor_username = doctor_username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getDoctor_password() {
+        return doctor_password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setDoctor_password(String doctor_password) {
+        this.doctor_password = doctor_password;
     }
 }

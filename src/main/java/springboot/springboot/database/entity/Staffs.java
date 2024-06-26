@@ -9,8 +9,8 @@ public class Staffs extends Entity<Integer> {
     private String staff_address;
     private String staff_type;
     private String staff_status;
-    private String username;
-    private String password;
+    private String staff_username;
+    private String staff_password;
     private List<Appointments> appointmentsList;
     public Staffs() {}
 
@@ -62,20 +62,20 @@ public class Staffs extends Entity<Integer> {
         this.staff_status = staff_status;
     }
 
-    public String getUsername() {
-        return username;
+    public String getStaff_username() {
+        return staff_username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setStaff_username(String staff_username) {
+        this.staff_username = staff_username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getStaff_password() {
+        return staff_password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setStaff_password(String staff_password) {
+        this.staff_password = staff_password;
     }
 
     public List<Appointments> getAppointmentsList() {

@@ -62,32 +62,40 @@ public class PatientsController<T extends Entity<?>> {
     }
 
     @GetMapping("/getById")
-    public List<Patients> getById(@RequestBody Map<String, Object> requestData) throws Exception {
+    public List<Patients> getById(@RequestParam Map<String, String> requestParams) throws Exception {
         List<Patients> patientsList = new ArrayList<>();
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
-        Patients patients1 = modelMapper.map(requestData, Patients.class);
+
+        // Chuyển đổi Map các tham số truy vấn thành đối tượng Patients
+        Patients patients1 = modelMapper.map(requestParams, Patients.class);
+
         List<Patients> patients = model.getEntityById(patients1);
         for (Patients patient : patients) {
             Patients newPatient = new Patients();
             BeanUtils.copyProperties(patient, newPatient);
+
             // Lấy danh sách Medicalrecords và Appointments dựa trên patient_id
             Medicalrecords medicalrecordsFilter = new Medicalrecords();
             medicalrecordsFilter.setPatient_id(patient.getPatient_id());
             List<Medicalrecords> medicalrecordsList = model.getEntityById(medicalrecordsFilter);
-            List<Medicalrecords>medicalrecords = medicalrecords(medicalrecordsList);
+            List<Medicalrecords> medicalrecords = medicalrecords(medicalrecordsList);
+
             Appointments appointmentsFilter = new Appointments();
             appointmentsFilter.setPatient_id(patient.getPatient_id());
             List<Appointments> appointmentsList = model.getEntityById(appointmentsFilter);
-            List<Appointments> appointments= listAppointments(appointmentsList);
+            List<Appointments> appointments = listAppointments(appointmentsList);
+
             // Gán danh sách vào các trường list tương ứng với các class
             newPatient.setMedicalrecordsList(medicalrecords);
             newPatient.setAppointmentsList(appointments);
             patientsList.add(newPatient);
         }
+
         json.writeEmployeeToJson(patientsList, patients.getClass(), "getbyfields");
         return patientsList;
     }
+
 
     @PostMapping("/insertAll")
     public void insertAll(@RequestBody List<Map<String, Object>> dataList) throws SQLException, IllegalAccessException {
