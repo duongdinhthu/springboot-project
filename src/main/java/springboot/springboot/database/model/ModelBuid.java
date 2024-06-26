@@ -520,10 +520,9 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         return entityList;
     }
     public void insertAll1(List<Entity> objectList) throws SQLException, IllegalAccessException {
-        PreparedStatement pstm = null;
-
-        try {
-            for (Entity entity : objectList) {
+        for (Entity entity : objectList) {
+            PreparedStatement pstm = null;
+            try {
                 String query = queryInsert(entity).toString(); // Tạo query insert riêng cho từng phần tử
                 pstm = openPstm(query);
                 System.out.println(query);
@@ -536,15 +535,14 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
                         pstm.setObject(parameterIndex++, value);
                     }
                 }
-
-
-            }
-            pstm.executeUpdate(); // Thực hiện insert cho từng phần tử
-        } finally {
-            if (pstm != null) {
-                pstm.close();
+                pstm.executeUpdate(); // Thực hiện insert cho từng phần tử
+            } finally {
+                if (pstm != null) {
+                    pstm.close();
+                }
             }
         }
     }
+
 }
 

@@ -30,20 +30,16 @@ public class AdminController<T extends Entity<?>> {
     public String insertAllObject(@RequestBody List<Map<String, Object>> dataList) throws SQLException, IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
-
         List<DataModel> dataModelList = new ArrayList<>();
-
         for (Map<String, Object> data : dataList) {
             DataModel dataModel = new DataModel();
             dataModel.type = (String) data.get("type");
             dataModel.data = new HashMap<>();
-
             for (Map.Entry<String, Object> entry : data.entrySet()) {
                 if (!entry.getKey().equals("type")) {
                     dataModel.data.put(entry.getKey(), entry.getValue().toString());
                 }
             }
-
             dataModelList.add(dataModel);
         }
 
@@ -97,7 +93,6 @@ public class AdminController<T extends Entity<?>> {
             DataModel dataModel = new DataModel();
             dataModel.type = (String) data.get("type");
             dataModel.data = new HashMap<>();
-
             for (Map.Entry<String, Object> entry : data.entrySet()) {
                 if (!entry.getKey().equals("type")) {
                     dataModel.data.put(entry.getKey(), entry.getValue().toString());
