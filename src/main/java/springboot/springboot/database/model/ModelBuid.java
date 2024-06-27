@@ -567,7 +567,6 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         }
         int index = 1;
         for (Field f : validFields) {
-
             Object val = f.get(entity);
             pstm.setObject(index, val);
             index++;
@@ -582,8 +581,12 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
                     field.setAccessible(true);
                     if (field.getName().equals(columnName)) {
                         Object fieldValue = rs.getObject(i);
+                        // Kiểm tra nếu fieldValue là null và kiểu dữ liệu của field là nguyên thủy (như int)
+                        if (fieldValue == null && field.getType().isPrimitive()) {
+                            // Nếu fieldValue là null và field là nguyên thủy, bỏ qua việc thiết lập giá trị
+                            continue;
+                        }
                         field.set(newEntity, fieldValue);
-
                         break;
                     }
                 }
@@ -591,9 +594,9 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
             entityList.add(newEntity);
         }
 
-
         return entityList;
     }
+
 
     public T getManyToOne(Entity entity) throws SQLException, IllegalAccessException, InstantiationException {
         String query = queryGetEntityById(entity).toString();

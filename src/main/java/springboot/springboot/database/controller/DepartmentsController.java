@@ -80,6 +80,31 @@ public class DepartmentsController<T extends Entity<?>> {
         return departmentsList;
     }
 
+    @GetMapping("/{departmentId}/doctors")
+    public List<Doctors> getDoctorsByDepartmentId(@PathVariable("departmentId") int departmentId) throws SQLException, IllegalAccessException, InstantiationException {
+        List<Doctors> doctorsList = new ArrayList<>();
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.addConverter(new StringToDateConverter());
+
+        Doctors doctors1 = new Doctors();
+        doctors1.setDepartment_id(departmentId);
+
+        List<Doctors> doctors = model.getEntityById(doctors1);
+        for (Doctors doctor : doctors) {
+            Doctors newDoctor = new Doctors();
+            BeanUtils.copyProperties(doctor, newDoctor);
+
+            // Chỉ lấy thông tin cơ bản của bác sĩ, không lấy các thông tin liên quan khác
+            newDoctor.setMedicalrecordsList(null);
+            newDoctor.setAppointmentsList(null);
+            newDoctor.setDepartment(null);
+
+            doctorsList.add(newDoctor);
+        }
+        return doctorsList;
+    }
+
+
     @PostMapping("/insertAll")
     public void insertAll(@RequestBody List<Map<String, Object>> dataList) throws SQLException, IllegalAccessException {
         List<Departments> departmentsList = new ArrayList<>();

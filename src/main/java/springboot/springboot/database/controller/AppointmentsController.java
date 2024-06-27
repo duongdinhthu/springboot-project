@@ -1,13 +1,13 @@
 package springboot.springboot.database.controller;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 import springboot.springboot.database.entity.*;
 import springboot.springboot.database.model.EntityToJSON;
 import springboot.springboot.database.model.ModelBuid;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
@@ -17,9 +17,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/appointments")
-
 public class AppointmentsController<T extends Entity<?>> {
+
     private EntityToJSON json = new EntityToJSON();
+
     @Autowired
     private ModelBuid model = new ModelBuid();
 
@@ -30,17 +31,28 @@ public class AppointmentsController<T extends Entity<?>> {
 
     @PostMapping("/insert")
     public void insert(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException, InstantiationException {
-        ModelMapper modelMapper = new ModelMapper();//Tạo một đối tượng modelMapper từ lớp ModelMapper,
-        // được sử dụng để thực hiện ánh xạ dữ liệu giữa các đối tượng.
-        modelMapper.addConverter(new StringToDateConverter());// Thêm một Converter mới vào ModelMapper
-        // để chỉ định cách chuyển đổi giữa các kiểu dữ liệu.
-        // Trong trường hợp này, trình chuyển đổi StringToDateConverter
-        // được thêm vào để giúp chuyển đổi dữ liệu từ kiểu String sang kiểu Date khi ánh xạ.
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.addConverter(new StringToDateConverter());
+
+        // Map requestData to Patients
+        Patients patient = modelMapper.map(requestData, Patients.class);
+
+        // Check if patient exists
+        Patients patientExample = new Patients();
+        patientExample.setPatient_email(patient.getPatient_email());
+        List<Patients> existingPatients = model.getEntityById(patientExample);
+
+        Integer patientId;
+        if (existingPatients.isEmpty()) {
+            // Insert new patient if not exists
+            patientId = model.insert(patient);  // Get generated patient_id
+        } else {
+            patientId = existingPatients.get(0).getPatient_id();
+        }
+
+        // Map requestData to Appointments
         Appointments appointments = modelMapper.map(requestData, Appointments.class);
-        //Sử dụng ModelMapper để ánh xạ dữ liệu từ đối tượng requestData vào đối tượng Payments.
-        // ModelMapper sẽ tự động ánh xạ các trường dữ liệu tương ứng giữa hai đối tượng dựa trên tên trường
-        // và kiểu dữ liệu của chúng. Trong quá trình ánh xạ, Converter đã được thêm vào trước đó sẽ được sử dụng để
-        // chuyển đổi dữ liệu từ String sang Date (hoặc bất kỳ loại dữ liệu nào mà Converter xử lý).
+        appointments.setPatient_id(patientId);
         model.insert(appointments);
     }
 
@@ -62,37 +74,58 @@ public class AppointmentsController<T extends Entity<?>> {
     }
 
     @GetMapping("/list")
-    public List<T> list() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public List<T> list() throws SQLException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
         List<T> list = model.getAll(new Appointments().getClass());
         return list;
     }
 
-    @GetMapping("/getById")
+    @GetMapping("/getAppointments")
     public List<Appointments> getById(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException, InstantiationException {
         List<Appointments> appointmentsList = new ArrayList<>();
-        // Truy vấn danh sách bệnh nhân từ cơ sở dữ liệu với id chỉ định
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
         Appointments appointments1 = modelMapper.map(requestData, Appointments.class);
         List<Appointments> appointments = model.getEntityById(appointments1);
         for (Appointments appointment : appointments) {
-            Appointments newAppoinment = new Appointments();
-            // Copy dữ liệu từ patient vào newPatient
-            BeanUtils.copyProperties(appointment, newAppoinment);
-            // Gán danh sách vào các trường list tương ứng với các class
+            Appointments newAppointment = new Appointments();
+            BeanUtils.copyProperties(appointment, newAppointment);
+
+            // Get and set Staff details
             Staffs staffs = new Staffs();
             staffs.setStaff_id(appointment.getStaff_id());
-            newAppoinment.setStaff(model.getEntityById(staffs));
+            newAppointment.setStaff(model.getEntityById(staffs));
+
+            // Get and set Doctor details
             Doctors doctors = new Doctors();
             doctors.setDoctor_id(appointment.getDoctor_id());
-            newAppoinment.setDoctor(model.getEntityById(doctors));
+            newAppointment.setDoctor(model.getEntityById(doctors));
+
+            // Get and set Patient details
             Patients patients = new Patients();
             patients.setPatient_id(appointment.getPatient_id());
-            newAppoinment.setPatient(model.getEntityById(patients));
-            appointmentsList.add(newAppoinment);
+            newAppointment.setPatient(model.getEntityById(patients));
+
+            appointmentsList.add(newAppointment);
         }
         return appointmentsList;
     }
+    @GetMapping("/{doctorId}/slots")
+    public List<Appointments> getAppointmentsByDoctorId(@PathVariable("doctorId") int doctorId) throws SQLException, IllegalAccessException, InstantiationException {
+        Appointments example = new Appointments();
+        example.setDoctor_id(doctorId);
+
+        List<Appointments> appointmentsList = new ArrayList<>();
+        List<Appointments> appointments = model.getEntityById(example);
+
+        for (Appointments appointment : appointments) {
+            Appointments newAppointment = new Appointments();
+            BeanUtils.copyProperties(appointment, newAppointment, "patient_id", "staff_id", "price", "payment_name", "status");
+            appointmentsList.add(newAppointment);
+        }
+
+        return appointmentsList;
+    }
+
 
     @PostMapping("/insertAll")
     public void insertAll(@RequestBody List<Map<String, Object>> dataList) throws SQLException, IllegalAccessException {
@@ -106,10 +139,9 @@ public class AppointmentsController<T extends Entity<?>> {
         }
         model.insertAll(appointmentsList);
     }
+
     public static Object createElementInstance(Class<?> elementType) throws Exception {
-        // Kiểm tra xem lớp cụ thể có constructor mặc định không
         Constructor<?> constructor = elementType.getConstructor();
-        // Tạo một đối tượng mới thông qua constructor mặc định của lớp cụ thể
         return constructor.newInstance();
     }
 }

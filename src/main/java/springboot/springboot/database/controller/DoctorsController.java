@@ -83,7 +83,6 @@ public class DoctorsController<T extends Entity<?>> {
         }
         return doctorsList;
     }
-
     @PostMapping("/insertAll")
     public void insertAll(@RequestBody List<Map<String, Object>> dataList) throws SQLException, IllegalAccessException, InstantiationException {
         List<Doctors> doctorsList = new ArrayList<>();
@@ -103,4 +102,5 @@ public class DoctorsController<T extends Entity<?>> {
         // Tạo một đối tượng mới thông qua constructor mặc định của lớp cụ thể
         return constructor.newInstance();
     }
+
 }
