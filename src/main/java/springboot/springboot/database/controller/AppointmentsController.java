@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import springboot.springboot.database.entity.*;
 import springboot.springboot.database.model.EntityToJSON;
 import springboot.springboot.database.model.ModelBuid;
+import springboot.springboot.database.model.SendEmail;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -20,7 +21,7 @@ import java.util.Map;
 public class AppointmentsController<T extends Entity<?>> {
 
     private EntityToJSON json = new EntityToJSON();
-
+    private SendEmail sendEmail = new SendEmail();
     @Autowired
     private ModelBuid model = new ModelBuid();
 
@@ -45,7 +46,16 @@ public class AppointmentsController<T extends Entity<?>> {
         Integer patientId;
         if (existingPatients.isEmpty()) {
             // Insert new patient if not exists
-            patientId = model.insert(patient);  // Get generated patient_id
+            patientId = model.insert(patient);
+
+            // Get patient_name, patient_email, and patient_password from requestData
+            String patientName = (String) requestData.get("patient_name");
+            String patientEmail = (String) requestData.get("patient_email");
+            String patientPassword = (String) requestData.get("patient_password");
+
+            // Send email with account information
+            sendEmail.sendEmail(patientName, patientEmail, patientPassword);
+
         } else {
             patientId = existingPatients.get(0).getPatient_id();
         }
@@ -55,6 +65,7 @@ public class AppointmentsController<T extends Entity<?>> {
         appointments.setPatient_id(patientId);
         model.insert(appointments);
     }
+
 
     @PutMapping("/update")
     public void update(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
@@ -113,7 +124,6 @@ public class AppointmentsController<T extends Entity<?>> {
     public List<Appointments> getAppointmentsByDoctorId(@PathVariable("doctorId") int doctorId) throws SQLException, IllegalAccessException, InstantiationException {
         Appointments example = new Appointments();
         example.setDoctor_id(doctorId);
-
         List<Appointments> appointmentsList = new ArrayList<>();
         List<Appointments> appointments = model.getEntityById(example);
 
