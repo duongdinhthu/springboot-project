@@ -2,6 +2,8 @@ package springboot.springboot.database.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,10 +13,7 @@ import springboot.springboot.database.model.ModelBuid;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/patients")
@@ -61,7 +60,7 @@ public class PatientsController<T extends Entity<?>> {
             return list;
     }
 
-    @GetMapping("/getById")
+    @GetMapping("/getPatients")
     public List<Patients> getById(@RequestParam Map<String, String> requestParams) throws Exception {
         List<Patients> patientsList = new ArrayList<>();
         ModelMapper modelMapper = new ModelMapper();
@@ -94,6 +93,21 @@ public class PatientsController<T extends Entity<?>> {
 
         json.writeEmployeeToJson(patientsList, patients.getClass(), "getbyfields");
         return patientsList;
+    }
+    @GetMapping("/login")
+    public ResponseEntity<?> login(@RequestParam String patient_username, @RequestParam String patient_password) throws Exception {
+        Patients patients1 = new Patients();
+        patients1.setPatient_username(patient_username);
+        patients1.setPatient_password(patient_password);
+
+        List<Patients> patients = model.getEntityById(patients1);
+
+        if (!patients.isEmpty()) {
+            Patients patient = patients.get(0); // Lấy thông tin bệnh nhân đầu tiên (nếu có nhiều)
+            return ResponseEntity.ok(Collections.singletonMap("patient_name", patient.getPatient_name()));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("success", false));
+        }
     }
 
 
