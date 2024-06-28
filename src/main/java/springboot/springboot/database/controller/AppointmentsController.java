@@ -7,8 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import springboot.springboot.database.entity.*;
 import springboot.springboot.database.model.EntityToJSON;
 import springboot.springboot.database.model.ModelBuid;
-import springboot.springboot.database.model.SendEmail;
-
+import springboot.springboot.database.model.SendEmailUsername;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
@@ -21,7 +20,7 @@ import java.util.Map;
 public class AppointmentsController<T extends Entity<?>> {
 
     private EntityToJSON json = new EntityToJSON();
-    private SendEmail sendEmail = new SendEmail();
+    private SendEmailUsername sendEmail = new SendEmailUsername();
     @Autowired
     private ModelBuid model = new ModelBuid();
 

@@ -7,8 +7,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.reflections.Reflections;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import springboot.springboot.database.connectDTB.MySqlConnect;
 import springboot.springboot.database.entity.Entity;
+import springboot.springboot.database.connectDTB.MySqlConnect;
 
 
 import java.lang.reflect.Field;

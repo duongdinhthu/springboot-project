@@ -6,7 +6,6 @@ import springboot.springboot.database.entity.Entity;
 
 import java.io.FileWriter;
 import java.util.List;
-import java.util.Scanner;
 
 public class EntityToJSON<T extends Entity<?>> {
     public void writeEmployeeToJson(List<T> entitties, Class entityClass, String method) throws Exception {

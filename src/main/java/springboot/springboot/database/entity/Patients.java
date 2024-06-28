@@ -14,9 +14,16 @@ public class Patients extends Entity<Integer> {
     private String patient_username;
     private List<Appointments> appointmentsList;
     private List<Medicalrecords> medicalrecordsList;
+    private String patient_gender;
 
 
+    public String getPatient_gender() {
+        return patient_gender;
+    }
 
+    public void setPatient_gender(String patient_gender) {
+        this.patient_gender = patient_gender;
+    }
 
     public Patients() {
     }

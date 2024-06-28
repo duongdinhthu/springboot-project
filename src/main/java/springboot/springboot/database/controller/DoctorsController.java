@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 import springboot.springboot.database.entity.*;
 import springboot.springboot.database.model.EntityToJSON;
 import springboot.springboot.database.model.ModelBuid;
+import springboot.springboot.database.entity.*;
 
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 import java.sql.SQLException;
