@@ -1,4 +1,5 @@
 package springboot.springboot.database.controller;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,10 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import springboot.springboot.database.entity.*;
 import springboot.springboot.database.model.EntityToJSON;
 import springboot.springboot.database.model.ModelBuid;
-
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -20,16 +21,15 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/v1/patients")
 public class PatientsController<T extends Entity<?>> {
+
     @Autowired
-    private ModelBuid model = new ModelBuid();
+    private ModelBuid model;
     private EntityToJSON json = new EntityToJSON();
 
     @GetMapping("/")
     public String showForm() {
         return "index";
     }
-
-
 
     @PostMapping("/insert")
     public void insert(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException, InstantiationException {
@@ -48,7 +48,7 @@ public class PatientsController<T extends Entity<?>> {
     }
 
     @DeleteMapping("/delete")
-    public String delete( @RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
+    public String delete(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
         Patients patients = modelMapper.map(requestData, Patients.class);
@@ -58,8 +58,7 @@ public class PatientsController<T extends Entity<?>> {
 
     @GetMapping("/list")
     public List<T> list() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-            List<T> list = model.getAll(new Patients().getClass());
-            return list;
+        return model.getAll(new Patients().getClass());
     }
 
     @GetMapping("/getPatients")
@@ -68,15 +67,13 @@ public class PatientsController<T extends Entity<?>> {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
 
-        // Chuyển đổi Map các tham số truy vấn thành đối tượng Patients
         Patients patients1 = modelMapper.map(requestParams, Patients.class);
-
         List<Patients> patients = model.getEntityById(patients1);
+
         for (Patients patient : patients) {
             Patients newPatient = new Patients();
             BeanUtils.copyProperties(patient, newPatient);
 
-            // Lấy danh sách Medicalrecords và Appointments dựa trên patient_id
             Medicalrecords medicalrecordsFilter = new Medicalrecords();
             medicalrecordsFilter.setPatient_id(patient.getPatient_id());
             List<Medicalrecords> medicalrecordsList = model.getEntityById(medicalrecordsFilter);
@@ -87,7 +84,6 @@ public class PatientsController<T extends Entity<?>> {
             List<Appointments> appointmentsList = model.getEntityById(appointmentsFilter);
             List<Appointments> appointments = listAppointments(appointmentsList);
 
-            // Gán danh sách vào các trường list tương ứng với các class
             newPatient.setMedicalrecordsList(medicalrecords);
             newPatient.setAppointmentsList(appointments);
             patientsList.add(newPatient);
@@ -96,6 +92,7 @@ public class PatientsController<T extends Entity<?>> {
         json.writeEmployeeToJson(patientsList, patients.getClass(), "getbyfields");
         return patientsList;
     }
+
     @GetMapping("/login")
     public ResponseEntity<?> login(@RequestParam String patient_username, @RequestParam String patient_password) throws Exception {
         Patients patients1 = new Patients();
@@ -112,6 +109,59 @@ public class PatientsController<T extends Entity<?>> {
         }
     }
 
+    @PostMapping("/google-login")
+    public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> request) throws Exception {
+        String email = request.get("email");
+        String name = request.get("name");
+        String password = request.get("password");
+
+        Patients patient = new Patients();
+        patient.setPatient_email(email);
+
+        List<Patients> patientsList = model.getEntityById(patient);
+
+        if (patientsList.isEmpty()) {
+            patient.setPatient_name(name);
+            patient.setPatient_password(password);
+            patient.setPatient_username(email);  // Assuming email is used as username
+            model.insert(patient);
+        } else {
+            patient = patientsList.get(0);
+        }
+
+        return ResponseEntity.ok(Collections.singletonMap("patient_name", patient.getPatient_name()));
+    }
+
+    @PostMapping("/facebook-login")
+    public ResponseEntity<?> facebookLogin(@RequestBody Map<String, String> request) throws Exception {
+        String accessToken = request.get("accessToken");
+        String userID = request.get("userID");
+
+        // Facebook API URL to get user info
+        String facebookUrl = "https://graph.facebook.com/" + userID + "?fields=id,name,email&access_token=" + accessToken;
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Map> response = restTemplate.getForEntity(facebookUrl, Map.class);
+
+        Map<String, Object> userInfo = response.getBody();
+        String email = (String) userInfo.get("email");
+        String name = (String) userInfo.get("name");
+
+        Patients patient = new Patients();
+        patient.setPatient_email(email);
+
+        List<Patients> patientsList = model.getEntityById(patient);
+
+        if (patientsList.isEmpty()) {
+            patient.setPatient_name(name);
+            patient.setPatient_password(UUID.randomUUID().toString()); // Generate random password
+            patient.setPatient_username(email);  // Assuming email is used as username
+            model.insert(patient);
+        } else {
+            patient = patientsList.get(0);
+        }
+
+        return ResponseEntity.ok(Collections.singletonMap("patient_name", patient.getPatient_name()));
+    }
 
     @PostMapping("/insertAll")
     public void insertAll(@RequestBody List<Map<String, Object>> dataList) throws SQLException, IllegalAccessException {
@@ -124,6 +174,7 @@ public class PatientsController<T extends Entity<?>> {
         }
         model.insertAll(patientsList);
     }
+
     public static List<String> getChildClassFieldNames(Class<?> parentClass) {
         List<String> childFieldNames = new ArrayList<>();
 
@@ -133,12 +184,12 @@ public class PatientsController<T extends Entity<?>> {
             Class<?> fieldClass = field.getType();
             if (fieldClass != null && !fieldClass.isPrimitive() && fieldClass != String.class && !parentClass.isAssignableFrom(fieldClass) && fieldClass != Date.class) {
                 childFieldNames.add(field.getName());
-
             }
         }
         return childFieldNames;
     }
-    public  List<Doctors> listDoctors(List<Doctors> doctorsList) throws SQLException,  InstantiationException, IllegalAccessException {
+
+    public List<Doctors> listDoctors(List<Doctors> doctorsList) throws SQLException, InstantiationException, IllegalAccessException {
         List<Doctors> doctors = new ArrayList<>();
         for (Doctors doctor : doctorsList) {
             Doctors newDoctor = new Doctors();
@@ -150,7 +201,8 @@ public class PatientsController<T extends Entity<?>> {
         }
         return doctors;
     }
-    public List<Appointments> listAppointments(List<Appointments> appointmentsList) throws SQLException,  InstantiationException, IllegalAccessException {
+
+    public List<Appointments> listAppointments(List<Appointments> appointmentsList) throws SQLException, InstantiationException, IllegalAccessException {
         List<Appointments> appointments = new ArrayList<>();
         for (Appointments appointment : appointmentsList) {
             Appointments newAppointment = new Appointments();
@@ -167,6 +219,7 @@ public class PatientsController<T extends Entity<?>> {
         }
         return appointments;
     }
+
     public List<Medicalrecords> medicalrecords(List<Medicalrecords> medicalrecordsList) throws SQLException, IllegalAccessException, InstantiationException {
         List<Medicalrecords> medicalrecords = new ArrayList<>();
         for (Medicalrecords medicalrecord : medicalrecordsList) {
