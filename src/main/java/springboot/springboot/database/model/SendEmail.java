@@ -10,10 +10,10 @@ public class SendEmail {
     public void sendEmail(String name,String email,String passwordpatient) {
         final String username = "thuddth2307004@fpt.edu.vn";
         final String password = "kyxm zvbz nvsn uxxx";
-        String subject = "<div>Chúng đã đã tự động đăng kí tài khoản tại FPTHealth ";
+        String subject = "Chúng đã đã tự động đăng kí tài khoản tại FPTHealth ";
         String body = "Xin chào "+name+" , để giúp bạn quản lí hồ sơ bệnh án , chúng tôi đã tạo tài khoản cho bạn trên hệ thồng , " +
                 "bạn có thể đăng nhập bất cứ lúc nào để xem lại hồ sơ bệnh án , nhận những phần quà tri ân cực ấp dẫn và đóng góp những ý kiến phản hồi để chúng tôi nâng cao dịch vụ !"
-                +"tài khoản của bạn là: " + email + " mật khẩu: " + passwordpatient+"</div>"
+                +"tài khoản của bạn là: " + email + " mật khẩu: " + passwordpatient
                 ;
 
         Properties props = new Properties();
