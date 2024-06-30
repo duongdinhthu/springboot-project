@@ -10,7 +10,6 @@ public class SendEmailUsername {
     public void sendEmail(String name, String email, String passwordpatient) {
         final String username = "thuddth2307004@fpt.edu.vn";
         final String password = "kyxm zvbz nvsn uxxx";
-<<<<<<< Updated upstream
         String subject = "Welcome to FPT Health";
         String body = "<html>" +
                 "<head>" +
@@ -39,12 +38,7 @@ public class SendEmailUsername {
                 "</div>" +
                 "</body>" +
                 "</html>";
-=======
-        String subject = "Chúng đã đã tự động đăng kí tài khoản tại FPTHealth ";
-        String body = "Xin chào " + name + " , để giúp bạn quản lí hồ sơ bệnh án , chúng tôi đã tạo tài khoản cho bạn trên hệ thồng , " +
-                "bạn có thể đăng nhập bất cứ lúc nào để xem lại hồ sơ bệnh án , nhận những phần quà tri ân cực ấp dẫn và đóng góp những ý kiến phản hồi để chúng tôi nâng cao dịch vụ !"
-                + "tài khoản của bạn là: " + email + " mật khẩu: " + passwordpatient;
->>>>>>> Stashed changes
+
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -64,15 +58,10 @@ public class SendEmailUsername {
                     InternetAddress.parse(email));
 
             message.setSubject(subject);
-<<<<<<< Updated upstream
             message.setContent(body, "text/html; charset=utf-8");
-=======
             message.setText(body);
-
             Transport.send(message);
-
             System.out.println("Email sent successfully");
-
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
@@ -102,11 +91,8 @@ public class SendEmailUsername {
             message.setFrom(new InternetAddress("thuddth2307004@fpt.edu.vn"));
             message.setRecipients(Message.RecipientType.TO,
                     InternetAddress.parse(patientEmail));
-
             message.setSubject(subject);
             message.setText(body);
->>>>>>> Stashed changes
-
             Transport.send(message);
 
             System.out.println("Email sent successfully");
