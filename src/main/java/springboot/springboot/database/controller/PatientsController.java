@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import springboot.springboot.database.entity.*;
 import springboot.springboot.database.model.EntityToJSON;
@@ -94,17 +92,20 @@ public class PatientsController<T extends Entity<?>> {
         return patientsList;
     }
 
-    @GetMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String patient_username, @RequestParam String patient_password) throws Exception {
-        Patients patients1 = new Patients();
-        patients1.setPatient_username(patient_username);
-        patients1.setPatient_password(patient_password);
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) throws Exception {
+        String patientUsername = loginRequest.get("email");
+        String patientPassword = loginRequest.get("password");
 
-        List<Patients> patients = model.getEntityById(patients1);
+        Patients patientExample = new Patients();
+        patientExample.setPatient_username(patientUsername);
+        patientExample.setPatient_password(patientPassword);
+
+        List<Patients> patients = model.getEntityById(patientExample);
 
         if (!patients.isEmpty()) {
             Patients patient = patients.get(0); // Lấy thông tin bệnh nhân đầu tiên (nếu có nhiều)
-            return ResponseEntity.ok(Collections.singletonMap("patient_name", patient.getPatient_name()));
+            return ResponseEntity.ok(Collections.singletonMap("username", patient.getPatient_name()));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("success", false));
         }
@@ -130,7 +131,7 @@ public class PatientsController<T extends Entity<?>> {
             patient = patientsList.get(0);
         }
 
-        return ResponseEntity.ok(Collections.singletonMap("patient_name", patient.getPatient_name()));
+        return ResponseEntity.ok(Collections.singletonMap("username", patient.getPatient_name()));
     }
 
     @PostMapping("/facebook-login")
@@ -161,7 +162,7 @@ public class PatientsController<T extends Entity<?>> {
             patient = patientsList.get(0);
         }
 
-        return ResponseEntity.ok(Collections.singletonMap("patient_name", patient.getPatient_name()));
+        return ResponseEntity.ok(Collections.singletonMap("username", patient.getPatient_name()));
     }
 
     @PostMapping("/insertAll")
