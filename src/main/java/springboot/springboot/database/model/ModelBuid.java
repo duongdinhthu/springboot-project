@@ -111,7 +111,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
             fields[i].setAccessible(true);
             try {
                 Object value = fields[i].get(entity);
-                if (value != null) {
+                if (value != null && !"0".equals(value.toString())) {
                     updatedFields.add(fields[i]);
                     fieldValues.add(value);
                 }
@@ -178,6 +178,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         }
         return query;
     }
+
     public List<Entity> executeQueryGetAll(Entity entity) throws IllegalAccessException {
         StringBuilder query = queryGetAll(entity);
         Object[] params = extractParams(entity);
@@ -214,6 +215,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
 
         return params.toArray();
     }
+
     private StringBuilder queryGetAll(Class<T> entityClass) {
         String tableName = getTableName(entityClass);
         StringBuilder query = new StringBuilder("select * from ");
@@ -367,6 +369,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         });
         return entities;
     }
+
     private StringBuilder queryGetEntityById(Entity entity) {
         String tableName = getTableName((Class<T>) entity.getClass());
         StringBuilder query = new StringBuilder("select * from ");
@@ -470,7 +473,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         for (int i = 1; i < fields.length; i++) {
             fields[i].setAccessible(true);
             Object value = fields[i].get(entity);
-            if (value != null) {
+            if (value != null && !"0".equals(value.toString())) {
                 pstm.setObject(parameterIndex++, value);
             }
         }
@@ -641,6 +644,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
 
         return newEntity;
     }
+
     public List<Entity> getEntityListById(List<Entity> listObject) throws SQLException {
         List<Entity> entityList = new ArrayList<>();
         Connection conn = null;
@@ -684,7 +688,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
                         String columnName = field.getName();
                         Object fieldValue = rs.getObject(columnName);
 
-                        if (fieldValue != null&&!"0".equals(fieldValue.toString())) {
+                        if (fieldValue != null && !"0".equals(fieldValue.toString())) {
                             field.set(newEntity, fieldValue);
                             System.out.println(columnName + ": " + fieldValue);
                         }
@@ -694,7 +698,8 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
 
                 entityList.addAll(tempEntityList); // Thêm tất cả entity mới vào entityList sau khi xử lý ResultSet
             }
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             // Xử lý ngoại lệ khi tạo mới Entity không thành công
             e.printStackTrace();
         } finally {
@@ -711,6 +716,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
 
         return entityList;
     }
+
     public void insertAll1(List<Entity> objectList) throws SQLException, IllegalAccessException {
         for (Entity entity : objectList) {
             PreparedStatement pstm = null;
@@ -735,6 +741,59 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
             }
         }
     }
+
+    public void forgotPassword(String patientEmail, String patientCode) throws SQLException {
+        StringBuilder query = queryforgot(patientEmail, patientCode);
+        try (Connection connection = openConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query.toString())) {
+
+            // Đặt các giá trị tham số cho câu lệnh SQL
+            preparedStatement.setString(1, patientCode);
+            preparedStatement.setString(2, patientEmail);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Updating record failed, no rows affected.");
+            }
+        }
+    }
+
+    private StringBuilder queryforgot(String patientEmail, String patientCode) {
+        String tableName = "patients"; // Tên bảng trong cơ sở dữ liệu
+        StringBuilder query = new StringBuilder("UPDATE ");
+        query.append(tableName).append(" SET ");
+
+        // Thêm patient_code vào phần set
+        query.append("patient_code = ?");
+
+        // Thêm điều kiện where với patient_email
+        query.append(" WHERE patient_email = ?");
+
+        // In ra câu lệnh SQL để kiểm tra
+        System.out.println("SQL Query: " + query.toString());
+        System.out.println("patient_code: " + patientCode);
+        System.out.println("patient_email: " + patientEmail);
+
+        return query;
+    }
+
+    public void resetPassword(String patientEmail, String patientCode, String newPassword) throws SQLException {
+        String query = "UPDATE patients SET patient_password = ?, patient_code = NULL WHERE patient_email = ? AND patient_code = ?";
+        System.out.println(query);
+        try (Connection connection = openConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, newPassword);
+            preparedStatement.setString(2, patientEmail);
+            preparedStatement.setString(3, patientCode);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Updating password failed, no rows affected.");
+            }
+        }
+    }
+
 
 }
 

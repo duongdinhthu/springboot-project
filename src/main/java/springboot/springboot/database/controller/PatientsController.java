@@ -44,6 +44,8 @@ public class PatientsController<T extends Entity<?>> {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
         Patients patients = modelMapper.map(requestData, Patients.class);
+        patients.setAppointmentsList(null);
+        patients.setMedicalrecordsList(null);
         model.update(patients);
     }
 
@@ -73,7 +75,6 @@ public class PatientsController<T extends Entity<?>> {
         for (Patients patient : patients) {
             Patients newPatient = new Patients();
             BeanUtils.copyProperties(patient, newPatient);
-
             Medicalrecords medicalrecordsFilter = new Medicalrecords();
             medicalrecordsFilter.setPatient_id(patient.getPatient_id());
             List<Medicalrecords> medicalrecordsList = model.getEntityById(medicalrecordsFilter);
@@ -232,4 +233,5 @@ public class PatientsController<T extends Entity<?>> {
         }
         return medicalrecords;
     }
+
 }

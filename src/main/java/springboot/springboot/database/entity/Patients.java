@@ -15,7 +15,7 @@ public class Patients extends Entity<Integer> {
     private List<Appointments> appointmentsList;
     private List<Medicalrecords> medicalrecordsList;
     private String patient_gender;
-
+private String patient_code;
 
     public String getPatient_gender() {
         return patient_gender;
@@ -29,9 +29,13 @@ public class Patients extends Entity<Integer> {
     }
 
 
+    public String getPatient_code() {
+        return patient_code;
+    }
 
-
-
+    public void setPatient_code(String patient_code) {
+        this.patient_code = patient_code;
+    }
 
     public List<Appointments> getAppointmentsList() {
         return appointmentsList;
