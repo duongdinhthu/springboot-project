@@ -2,7 +2,6 @@ package springboot.springboot.database.controller;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import springboot.springboot.database.entity.Entity;
@@ -21,8 +20,7 @@ public class AdminController<T extends Entity<?>> {
     @Autowired
     private ModelBuid model;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+
 
     @RequestMapping("/insertAll")
     public String insertAllObject(@RequestBody List<Map<String, Object>> dataList) throws SQLException, IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException {
