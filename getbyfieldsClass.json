@@ -1,12 +1,12 @@
 [
   {
-    "patient_id": 93,
-    "patient_name": "duongthu",
-    "patient_email": "duongthutb94@gmail.com",
-    "patient_phone": 456546,
-    "patient_address": "HN",
-    "patient_password": "nuyRtxp3",
-    "patient_username": "duongthutb94@gmail.com",
+    "staff_id": 1,
+    "staff_name": "Nguyen Van A",
+    "staff_phone": 123654798,
+    "staff_address": "Ha Noi",
+    "staff_type": "staff",
+    "staff_username": "staff1",
+    "staff_password": "staff1",
     "appointmentsList": [
       {
         "appointment_id": 40,
@@ -17,6 +17,19 @@
         "slot": 2,
         "status": "Pending",
         "staff_id": 1,
+        "patient": [
+          {
+            "patient_id": 93,
+            "patient_name": "duong dinh thu",
+            "patient_dob": "Jul 11, 2024",
+            "patient_email": "duongthutb94@gmail.com",
+            "patient_phone": 981300594,
+            "patient_address": "HN",
+            "patient_password": "123",
+            "patient_username": "duongthutb94@gmail.com",
+            "patient_gender": "Female"
+          }
+        ],
         "doctor": [
           {
             "doctor_id": 1,
@@ -35,21 +48,8 @@
               }
             ]
           }
-        ],
-        "staff": [
-          {
-            "staff_id": 1,
-            "staff_name": "Nguyen Van A",
-            "staff_phone": 999999999,
-            "staff_address": "Ha Noi",
-            "staff_type": "staff",
-            "staff_username": "staff1",
-            "staff_password": "staff1"
-          }
         ]
       }
-    ],
-    "medicalrecordsList": [],
-    "patient_gender": "male"
+    ]
   }
 ]

@@ -1,15 +1,15 @@
 package springboot.springboot.database.controller;
 
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import springboot.springboot.database.entity.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import springboot.springboot.database.entity.*;
 import springboot.springboot.database.model.EntityToJSON;
 import springboot.springboot.database.model.ModelBuid;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -61,8 +61,8 @@ public class PatientsController<T extends Entity<?>> {
         return model.getAll(new Patients().getClass());
     }
 
-    @GetMapping("/getPatients")
-    public List<Patients> getById(@RequestParam Map<String, String> requestParams) throws Exception {
+    @GetMapping("/search")
+    public List<Patients> getByField(@RequestParam Map<String, String> requestParams) throws Exception {
         List<Patients> patientsList = new ArrayList<>();
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
@@ -96,7 +96,6 @@ public class PatientsController<T extends Entity<?>> {
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) throws Exception {
         String patientUsername = loginRequest.get("email");
         String patientPassword = loginRequest.get("password");
-
         Patients patientExample = new Patients();
         patientExample.setPatient_username(patientUsername);
         patientExample.setPatient_password(patientPassword);
@@ -175,6 +174,14 @@ public class PatientsController<T extends Entity<?>> {
             patientsList.add(patients);
         }
         model.insertAll(patientsList);
+    }
+
+    @GetMapping("/{patientId}/appointments")
+    public ResponseEntity<List<Appointments>> getAppointmentsByPatientId(@PathVariable int patientId) throws SQLException, IllegalAccessException, InstantiationException {
+        Appointments appointmentsFilter = new Appointments();
+        appointmentsFilter.setPatient_id(patientId);
+        List<Appointments> appointmentsList = model.getEntityById(appointmentsFilter);
+        return ResponseEntity.ok(listAppointments(appointmentsList));
     }
 
     public static List<String> getChildClassFieldNames(Class<?> parentClass) {

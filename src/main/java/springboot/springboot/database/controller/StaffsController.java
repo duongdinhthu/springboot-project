@@ -1,32 +1,26 @@
 package springboot.springboot.database.controller;
 
+import springboot.springboot.database.entity.*;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import springboot.springboot.database.model.EntityToJSON;
+import springboot.springboot.database.model.ModelBuid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import springboot.springboot.database.entity.*;
-import springboot.springboot.database.model.EntityToJSON;
-import springboot.springboot.database.model.ModelBuid;
-
-
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/staffs")
-public class StaffsController<T extends Entity<?>>{
-    private EntityToJSON json = new EntityToJSON();
-    @Autowired
-    private ModelBuid model = new ModelBuid();
+public class StaffsController<T extends Entity<?>> {
 
-    @GetMapping("/")
-    public String showForm() {
-        return "index";
-    }
+    @Autowired
+    private ModelBuid model;
+    private EntityToJSON json = new EntityToJSON();
 
     @PostMapping("/insert")
     public void insert(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException, InstantiationException {
@@ -41,11 +35,12 @@ public class StaffsController<T extends Entity<?>>{
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
         Staffs staffs = modelMapper.map(requestData, Staffs.class);
+        staffs.setAppointmentsList(null);
         model.update(staffs);
     }
 
     @DeleteMapping("/delete")
-    public String delete( @RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
+    public String delete(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
         Staffs staffs = modelMapper.map(requestData, Staffs.class);
@@ -54,29 +49,32 @@ public class StaffsController<T extends Entity<?>>{
     }
 
     @GetMapping("/list")
-    public List<T> list() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        List<T> list = model.getAll(new Staffs().getClass());
-        return list;
+    public List<T> list() throws SQLException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        return model.getAll(new Staffs().getClass());
     }
 
-    @GetMapping("/getById")
-    public List<Staffs> getById(@RequestBody Map<String, Object> requestData) throws Exception {
+    @GetMapping("/search")
+    public List<Staffs> getByField(@RequestParam Map<String, String> requestParams) throws Exception {
         List<Staffs> staffsList = new ArrayList<>();
-        // Truy vấn danh sách bệnh nhân từ cơ sở dữ liệu với id chỉ định
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
-        Staffs staffs1 = modelMapper.map(requestData, Staffs.class);
+
+        Staffs staffs1 = modelMapper.map(requestParams, Staffs.class);
         List<Staffs> staffs = model.getEntityById(staffs1);
+
         for (Staffs staff : staffs) {
             Staffs newStaff = new Staffs();
             BeanUtils.copyProperties(staff, newStaff);
+
             Appointments appointmentsFilter = new Appointments();
             appointmentsFilter.setStaff_id(staff.getStaff_id());
             List<Appointments> appointmentsList = model.getEntityById(appointmentsFilter);
-            List<Appointments> appointments = appointmentsList(appointmentsList);
+            List<Appointments> appointments = listAppointments(appointmentsList);
+
             newStaff.setAppointmentsList(appointments);
             staffsList.add(newStaff);
         }
+
         json.writeEmployeeToJson(staffsList, staffs.getClass(), "getbyfields");
         return staffsList;
     }
@@ -86,20 +84,43 @@ public class StaffsController<T extends Entity<?>>{
         List<Staffs> staffsList = new ArrayList<>();
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
-
         for (Map<String, Object> data : dataList) {
             Staffs staffs = modelMapper.map(data, Staffs.class);
             staffsList.add(staffs);
         }
         model.insertAll(staffsList);
     }
-    public static Object createElementInstance(Class<?> elementType) throws Exception {
-        // Kiểm tra xem lớp cụ thể có constructor mặc định không
-        Constructor<?> constructor = elementType.getConstructor();
-        // Tạo một đối tượng mới thông qua constructor mặc định của lớp cụ thể
-        return constructor.newInstance();
+
+    @GetMapping("/{staffId}/appointments")
+    public ResponseEntity<List<Appointments>> getAppointmentsByStaffId(@PathVariable int staffId) throws SQLException, IllegalAccessException, InstantiationException {
+        Appointments appointmentsFilter = new Appointments();
+        appointmentsFilter.setStaff_id(staffId);
+        List<Appointments> appointmentsList = model.getEntityById(appointmentsFilter);
+        return ResponseEntity.ok(listAppointments(appointmentsList));
     }
-    public List<Doctors> doctorsList(List<Doctors> doctorsList) throws SQLException, IllegalAccessException, InstantiationException {
+
+    public List<Appointments> listAppointments(List<Appointments> appointmentsList) throws SQLException, InstantiationException, IllegalAccessException {
+        List<Appointments> appointments = new ArrayList<>();
+        for (Appointments appointment : appointmentsList) {
+            Appointments newAppointment = new Appointments();
+            BeanUtils.copyProperties(appointment, newAppointment);
+
+            Doctors doctorsFilter = new Doctors();
+            doctorsFilter.setDoctor_id(appointment.getDoctor_id());
+            List<Doctors> doctorsList = model.getEntityById(doctorsFilter);
+            List<Doctors> doctors = listDoctors(doctorsList);
+            newAppointment.setDoctor(doctors);
+
+            Patients patientsFilter = new Patients();
+            patientsFilter.setPatient_id(appointment.getPatient_id());
+            newAppointment.setPatient(model.getEntityById(patientsFilter));
+
+            appointments.add(newAppointment);
+        }
+        return appointments;
+    }
+
+    public List<Doctors> listDoctors(List<Doctors> doctorsList) throws SQLException, InstantiationException, IllegalAccessException {
         List<Doctors> doctors = new ArrayList<>();
         for (Doctors doctor : doctorsList) {
             Doctors newDoctor = new Doctors();
@@ -110,36 +131,5 @@ public class StaffsController<T extends Entity<?>>{
             doctors.add(newDoctor);
         }
         return doctors;
-    }
-    public List<Patients> patientsList(List<Patients> patientsList) throws SQLException, IllegalAccessException, InstantiationException {
-        List<Patients> patients = new ArrayList<>();
-        for (Patients patient : patientsList) {
-            Patients newPatient = new Patients();
-            BeanUtils.copyProperties(patient, newPatient);
-            Medicalrecords medicalrecordsFilter = new Medicalrecords();
-            medicalrecordsFilter.setPatient_id(patient.getPatient_id());
-            newPatient.setMedicalrecordsList(model.getEntityById(medicalrecordsFilter));
-            patients.add(newPatient);
-        }
-        return patients;
-    }
-    public List<Appointments> appointmentsList(List<Appointments> appointmentsList) throws SQLException, IllegalAccessException, InstantiationException {
-        List<Appointments> appointments = new ArrayList<>();
-        for (Appointments appointment : appointmentsList) {
-            Appointments newAppointment = new Appointments();
-            BeanUtils.copyProperties(appointment, newAppointment);
-            Doctors doctorsFilter = new Doctors();
-            doctorsFilter.setDoctor_id(appointment.getDoctor_id());
-            List<Doctors> doctorsList = model.getEntityById(doctorsFilter);
-            List<Doctors>doctors = doctorsList(doctorsList);
-            newAppointment.setDoctor(doctors);
-            appointments.add(newAppointment);
-            Patients patientsFilter = new Patients();
-            patientsFilter.setPatient_id(appointment.getPatient_id());
-            List<Patients> patientsList = model.getEntityById(patientsFilter);
-            List<Patients> patients = patientsList(patientsList);
-            newAppointment.setPatient(patients);
-        }
-        return appointments;
     }
 }
