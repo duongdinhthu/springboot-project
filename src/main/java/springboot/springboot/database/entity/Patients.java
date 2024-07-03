@@ -4,60 +4,27 @@ import java.util.Date;
 import java.util.List;
 
 public class Patients extends Entity<Integer> {
-    private int patient_id;
+    private Integer patient_id;
     private String patient_name;
     private Date patient_dob;
     private String patient_email;
-    private int patient_phone;
+    private Integer patient_phone;
     private String patient_address;
     private String patient_password;
     private String patient_username;
     private List<Appointments> appointmentsList;
     private List<Medicalrecords> medicalrecordsList;
     private String patient_gender;
-private String patient_code;
-
-    public String getPatient_gender() {
-        return patient_gender;
-    }
-
-    public void setPatient_gender(String patient_gender) {
-        this.patient_gender = patient_gender;
-    }
+    private String patient_code;
 
     public Patients() {
     }
 
-
-    public String getPatient_code() {
-        return patient_code;
-    }
-
-    public void setPatient_code(String patient_code) {
-        this.patient_code = patient_code;
-    }
-
-    public List<Appointments> getAppointmentsList() {
-        return appointmentsList;
-    }
-
-    public void setAppointmentsList(List<Appointments> appointmentsList) {
-        this.appointmentsList = appointmentsList;
-    }
-
-    public List<Medicalrecords> getMedicalrecordsList() {
-        return medicalrecordsList;
-    }
-
-    public void setMedicalrecordsList(List<Medicalrecords> medicalrecordsList) {
-        this.medicalrecordsList = medicalrecordsList;
-    }
-
-    public int getPatient_id() {
+    public Integer getPatient_id() {
         return patient_id;
     }
 
-    public void setPatient_id(int patient_id) {
+    public void setPatient_id(Integer patient_id) {
         this.patient_id = patient_id;
     }
 
@@ -85,11 +52,11 @@ private String patient_code;
         this.patient_email = patient_email;
     }
 
-    public int getPatient_phone() {
+    public Integer getPatient_phone() {
         return patient_phone;
     }
 
-    public void setPatient_phone(int patient_phone) {
+    public void setPatient_phone(Integer patient_phone) {
         this.patient_phone = patient_phone;
     }
 
@@ -115,5 +82,37 @@ private String patient_code;
 
     public void setPatient_username(String patient_username) {
         this.patient_username = patient_username;
+    }
+
+    public List<Appointments> getAppointmentsList() {
+        return appointmentsList;
+    }
+
+    public void setAppointmentsList(List<Appointments> appointmentsList) {
+        this.appointmentsList = appointmentsList;
+    }
+
+    public List<Medicalrecords> getMedicalrecordsList() {
+        return medicalrecordsList;
+    }
+
+    public void setMedicalrecordsList(List<Medicalrecords> medicalrecordsList) {
+        this.medicalrecordsList = medicalrecordsList;
+    }
+
+    public String getPatient_gender() {
+        return patient_gender;
+    }
+
+    public void setPatient_gender(String patient_gender) {
+        this.patient_gender = patient_gender;
+    }
+
+    public String getPatient_code() {
+        return patient_code;
+    }
+
+    public void setPatient_code(String patient_code) {
+        this.patient_code = patient_code;
     }
 }

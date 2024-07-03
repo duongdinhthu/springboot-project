@@ -3,7 +3,7 @@ package springboot.springboot.database.entity;
 import java.util.List;
 
 public class Departments extends Entity<Integer>{
-    private int department_id;
+    private Integer department_id;
     private String department_name;
     private String location;
     private List<Doctors> doctorsList;
@@ -15,25 +15,11 @@ public class Departments extends Entity<Integer>{
     public Departments() {
     }
 
-    public Departments(String department_name, String location, List<Doctors> doctorsList) {
-        this.department_name = department_name;
-        this.location = location;
-        this.doctorsList = doctorsList;
-    }
-
-    public int getDepartment_id() {
+    public Integer getDepartment_id() {
         return department_id;
     }
 
-    public List<Doctors> getDoctorsList() {
-        return doctorsList;
-    }
-
-    public void setDoctorsList(List<Doctors> doctorsList) {
-        this.doctorsList = doctorsList;
-    }
-
-    public void setDepartment_id(int department_id) {
+    public void setDepartment_id(Integer department_id) {
         this.department_id = department_id;
     }
 
@@ -53,4 +39,11 @@ public class Departments extends Entity<Integer>{
         this.location = location;
     }
 
+    public List<Doctors> getDoctorsList() {
+        return doctorsList;
+    }
+
+    public void setDoctorsList(List<Doctors> doctorsList) {
+        this.doctorsList = doctorsList;
+    }
 }

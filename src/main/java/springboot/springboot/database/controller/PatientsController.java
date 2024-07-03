@@ -1,15 +1,15 @@
 package springboot.springboot.database.controller;
 
 import springboot.springboot.database.entity.*;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import springboot.springboot.database.model.EntityToJSON;
 import springboot.springboot.database.model.ModelBuid;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -203,9 +203,11 @@ public class PatientsController<T extends Entity<?>> {
         for (Doctors doctor : doctorsList) {
             Doctors newDoctor = new Doctors();
             BeanUtils.copyProperties(doctor, newDoctor);
-            Departments departmentsFilter = new Departments();
-            departmentsFilter.setDepartment_id(doctor.getDepartment_id());
-            newDoctor.setDepartment(model.getEntityById(departmentsFilter));
+            if (doctor.getDepartment_id() != null) {
+                Departments departmentsFilter = new Departments();
+                departmentsFilter.setDepartment_id(doctor.getDepartment_id());
+                newDoctor.setDepartment(model.getEntityById(departmentsFilter));
+            }
             doctors.add(newDoctor);
         }
         return doctors;
@@ -216,14 +218,18 @@ public class PatientsController<T extends Entity<?>> {
         for (Appointments appointment : appointmentsList) {
             Appointments newAppointment = new Appointments();
             BeanUtils.copyProperties(appointment, newAppointment);
-            Doctors doctorsFilter = new Doctors();
-            doctorsFilter.setDoctor_id(appointment.getDoctor_id());
-            List<Doctors> doctorsList = model.getEntityById(doctorsFilter);
-            List<Doctors> doctors = listDoctors(doctorsList);
-            newAppointment.setDoctor(doctors);
-            Staffs staffsFilter = new Staffs();
-            staffsFilter.setStaff_id(appointment.getStaff_id());
-            newAppointment.setStaff(model.getEntityById(staffsFilter));
+            if (appointment.getDoctor_id() != null) {
+                Doctors doctorsFilter = new Doctors();
+                doctorsFilter.setDoctor_id(appointment.getDoctor_id());
+                List<Doctors> doctorsList = model.getEntityById(doctorsFilter);
+                List<Doctors> doctors = listDoctors(doctorsList);
+                newAppointment.setDoctor(doctors);
+            }
+            if (appointment.getStaff_id() != null) {
+                Staffs staffsFilter = new Staffs();
+                staffsFilter.setStaff_id(appointment.getStaff_id());
+                newAppointment.setStaff(model.getEntityById(staffsFilter));
+            }
             appointments.add(newAppointment);
         }
         return appointments;
@@ -234,12 +240,13 @@ public class PatientsController<T extends Entity<?>> {
         for (Medicalrecords medicalrecord : medicalrecordsList) {
             Medicalrecords newMedicalrecord = new Medicalrecords();
             BeanUtils.copyProperties(medicalrecord, newMedicalrecord);
-            Doctors doctorsFilter = new Doctors();
-            doctorsFilter.setDoctor_id(medicalrecord.getDoctor_id());
-            newMedicalrecord.setDoctors(model.getEntityById(doctorsFilter));
+            if (medicalrecord.getDoctor_id() != null) {
+                Doctors doctorsFilter = new Doctors();
+                doctorsFilter.setDoctor_id(medicalrecord.getDoctor_id());
+                newMedicalrecord.setDoctors(model.getEntityById(doctorsFilter));
+            }
             medicalrecords.add(newMedicalrecord);
         }
         return medicalrecords;
     }
-
 }

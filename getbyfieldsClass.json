@@ -1,12 +1,20 @@
 [
   {
-    "staff_id": 1,
-    "staff_name": "Nguyen Van A",
-    "staff_phone": 123654798,
-    "staff_address": "Ha Noi",
-    "staff_type": "staff",
-    "staff_username": "staff1",
-    "staff_password": "staff1",
+    "doctor_id": 1,
+    "doctor_name": "Le Cong Hong Phuc",
+    "doctor_phone": 377792678,
+    "doctor_address": "Thanh Hoa",
+    "doctor_email": "hongphuc0835@gmail.com",
+    "department_id": 1,
+    "doctor_username": "hongphuc",
+    "doctor_password": "phuc123",
+    "department": [
+      {
+        "department_id": 1,
+        "department_name": "cardiology",
+        "location": "1st floor"
+      }
+    ],
     "appointmentsList": [
       {
         "appointment_id": 40,
@@ -17,19 +25,6 @@
         "slot": 2,
         "status": "Pending",
         "staff_id": 1,
-        "patient": [
-          {
-            "patient_id": 93,
-            "patient_name": "duong dinh thu",
-            "patient_dob": "Jul 11, 2024",
-            "patient_email": "duongthutb94@gmail.com",
-            "patient_phone": 981300594,
-            "patient_address": "HN",
-            "patient_password": "123",
-            "patient_username": "duongthutb94@gmail.com",
-            "patient_gender": "Female"
-          }
-        ],
         "doctor": [
           {
             "doctor_id": 1,
@@ -48,8 +43,62 @@
               }
             ]
           }
+        ],
+        "staff": [
+          {
+            "staff_id": 1,
+            "staff_name": "Nguyen Van A",
+            "staff_phone": 123654798,
+            "staff_address": "Ha Noi",
+            "staff_type": "staff",
+            "staff_status": "lv",
+            "staff_username": "staff1",
+            "staff_password": "staff1"
+          }
+        ]
+      },
+      {
+        "appointment_id": 41,
+        "patient_id": 98,
+        "doctor_id": 1,
+        "appointment_date": "Jul 2, 2024",
+        "medical_day": "Jul 11, 2024",
+        "slot": 1,
+        "status": "Pending",
+        "staff_id": 1,
+        "doctor": [
+          {
+            "doctor_id": 1,
+            "doctor_name": "Le Cong Hong Phuc",
+            "doctor_phone": 377792678,
+            "doctor_address": "Thanh Hoa",
+            "doctor_email": "hongphuc0835@gmail.com",
+            "department_id": 1,
+            "doctor_username": "hongphuc",
+            "doctor_password": "phuc123",
+            "department": [
+              {
+                "department_id": 1,
+                "department_name": "cardiology",
+                "location": "1st floor"
+              }
+            ]
+          }
+        ],
+        "staff": [
+          {
+            "staff_id": 1,
+            "staff_name": "Nguyen Van A",
+            "staff_phone": 123654798,
+            "staff_address": "Ha Noi",
+            "staff_type": "staff",
+            "staff_status": "lv",
+            "staff_username": "staff1",
+            "staff_password": "staff1"
+          }
         ]
       }
-    ]
+    ],
+    "medicalrecordsList": []
   }
 ]

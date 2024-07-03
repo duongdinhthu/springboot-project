@@ -20,6 +20,7 @@ public class Doctors extends Entity<Integer> {
 
     // Getters and Setters
 
+
     public Integer getDoctor_id() {
         return doctor_id;
     }

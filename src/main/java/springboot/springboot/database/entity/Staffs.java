@@ -3,9 +3,9 @@ package springboot.springboot.database.entity;
 import java.util.List;
 
 public class Staffs extends Entity<Integer> {
-    private int staff_id;
+    private Integer staff_id;
     private String staff_name;
-    private int staff_phone;
+    private Integer staff_phone;
     private String staff_address;
     private String staff_type;
     private String staff_status;
@@ -14,11 +14,11 @@ public class Staffs extends Entity<Integer> {
     private List<Appointments> appointmentsList;
     public Staffs() {}
 
-    public int getStaff_id() {
+    public Integer getStaff_id() {
         return staff_id;
     }
 
-    public void setStaff_id(int staff_id) {
+    public void setStaff_id(Integer staff_id) {
         this.staff_id = staff_id;
     }
 
@@ -30,11 +30,11 @@ public class Staffs extends Entity<Integer> {
         this.staff_name = staff_name;
     }
 
-    public int getStaff_phone() {
+    public Integer getStaff_phone() {
         return staff_phone;
     }
 
-    public void setStaff_phone(int staff_phone) {
+    public void setStaff_phone(Integer staff_phone) {
         this.staff_phone = staff_phone;
     }
 
