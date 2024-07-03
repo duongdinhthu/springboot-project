@@ -137,13 +137,30 @@ public class PatientsController<T extends Entity<?>> {
     public ResponseEntity<?> facebookLogin(@RequestBody Map<String, String> request) throws Exception {
         String accessToken = request.get("accessToken");
         String userID = request.get("userID");
+        System.out.println("ok");
+        if (accessToken == null || userID == null) {
+            return ResponseEntity.badRequest().body("Missing access token or user ID");
+        }
 
         // Facebook API URL to get user info
         String facebookUrl = "https://graph.facebook.com/" + userID + "?fields=id,name,email&access_token=" + accessToken;
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Map> response = restTemplate.getForEntity(facebookUrl, Map.class);
+        ResponseEntity<Map> response;
+        try {
+            response = restTemplate.getForEntity(facebookUrl, Map.class);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Facebook token or user ID");
+        }
+
+        if (response.getStatusCode() != HttpStatus.OK) {
+            return ResponseEntity.status(response.getStatusCode()).body("Failed to authenticate with Facebook");
+        }
 
         Map<String, Object> userInfo = response.getBody();
+        if (userInfo == null || !userInfo.containsKey("email") || !userInfo.containsKey("name")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Facebook response");
+        }
+
         String email = (String) userInfo.get("email");
         String name = (String) userInfo.get("name");
 
@@ -163,6 +180,7 @@ public class PatientsController<T extends Entity<?>> {
 
         return ResponseEntity.ok(Collections.singletonMap("username", patient.getPatient_name()));
     }
+
 
     @PostMapping("/insertAll")
     public void insertAll(@RequestBody List<Map<String, Object>> dataList) throws SQLException, IllegalAccessException {

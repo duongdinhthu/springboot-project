@@ -1,104 +1,34 @@
 [
   {
-    "doctor_id": 1,
-    "doctor_name": "Le Cong Hong Phuc",
-    "doctor_phone": 377792678,
-    "doctor_address": "Thanh Hoa",
-    "doctor_email": "hongphuc0835@gmail.com",
-    "department_id": 1,
-    "doctor_username": "hongphuc",
-    "doctor_password": "phuc123",
-    "department": [
+    "record_id": 11,
+    "patient_id": 99,
+    "symptoms": "dau bung",
+    "diagnosis": "ngo doc",
+    "treatment": "Tiem ",
+    "doctor_id": 2,
+    "patients": [
       {
-        "department_id": 1,
-        "department_name": "cardiology",
-        "location": "1st floor"
+        "patient_id": 99,
+        "patient_name": "duong dinh thu",
+        "patient_email": "thuddth2307004@fpt.edu.vn",
+        "patient_phone": 123456,
+        "patient_address": "tb",
+        "patient_password": "6kXV5pUB",
+        "patient_username": "thuddth2307004@fpt.edu.vn",
+        "patient_gender": "male"
       }
     ],
-    "appointmentsList": [
+    "doctors": [
       {
-        "appointment_id": 40,
-        "patient_id": 93,
-        "doctor_id": 1,
-        "appointment_date": "Jun 28, 2024",
-        "medical_day": "Jun 28, 2024",
-        "slot": 2,
-        "status": "Pending",
-        "staff_id": 1,
-        "doctor": [
-          {
-            "doctor_id": 1,
-            "doctor_name": "Le Cong Hong Phuc",
-            "doctor_phone": 377792678,
-            "doctor_address": "Thanh Hoa",
-            "doctor_email": "hongphuc0835@gmail.com",
-            "department_id": 1,
-            "doctor_username": "hongphuc",
-            "doctor_password": "phuc123",
-            "department": [
-              {
-                "department_id": 1,
-                "department_name": "cardiology",
-                "location": "1st floor"
-              }
-            ]
-          }
-        ],
-        "staff": [
-          {
-            "staff_id": 1,
-            "staff_name": "Nguyen Van A",
-            "staff_phone": 123654798,
-            "staff_address": "Ha Noi",
-            "staff_type": "staff",
-            "staff_status": "lv",
-            "staff_username": "staff1",
-            "staff_password": "staff1"
-          }
-        ]
-      },
-      {
-        "appointment_id": 41,
-        "patient_id": 98,
-        "doctor_id": 1,
-        "appointment_date": "Jul 2, 2024",
-        "medical_day": "Jul 11, 2024",
-        "slot": 1,
-        "status": "Pending",
-        "staff_id": 1,
-        "doctor": [
-          {
-            "doctor_id": 1,
-            "doctor_name": "Le Cong Hong Phuc",
-            "doctor_phone": 377792678,
-            "doctor_address": "Thanh Hoa",
-            "doctor_email": "hongphuc0835@gmail.com",
-            "department_id": 1,
-            "doctor_username": "hongphuc",
-            "doctor_password": "phuc123",
-            "department": [
-              {
-                "department_id": 1,
-                "department_name": "cardiology",
-                "location": "1st floor"
-              }
-            ]
-          }
-        ],
-        "staff": [
-          {
-            "staff_id": 1,
-            "staff_name": "Nguyen Van A",
-            "staff_phone": 123654798,
-            "staff_address": "Ha Noi",
-            "staff_type": "staff",
-            "staff_status": "lv",
-            "staff_username": "staff1",
-            "staff_password": "staff1"
-          }
-        ]
+        "doctor_id": 2,
+        "doctor_name": "Duong Dinh Thu",
+        "doctor_phone": 981300594,
+        "doctor_address": "hn",
+        "doctor_email": "duongthutb94@gmail.com",
+        "department_id": 2,
+        "doctor_username": "hongphuc",
+        "doctor_password": "phuc123"
       }
-    ],
-    "medicalrecordsList": []
+    ]
   }
 ]

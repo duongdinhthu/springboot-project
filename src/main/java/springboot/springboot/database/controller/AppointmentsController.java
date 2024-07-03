@@ -8,6 +8,7 @@ import springboot.springboot.database.entity.*;
 import springboot.springboot.database.model.EntityToJSON;
 import springboot.springboot.database.model.ModelBuid;
 import springboot.springboot.database.model.SendEmailUsername;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
@@ -21,8 +22,9 @@ public class AppointmentsController<T extends Entity<?>> {
 
     private EntityToJSON json = new EntityToJSON();
     private SendEmailUsername sendEmail = new SendEmailUsername();
+
     @Autowired
-    private ModelBuid model = new ModelBuid();
+    private ModelBuid model;
 
     @GetMapping("/")
     public String showForm() {
@@ -65,7 +67,6 @@ public class AppointmentsController<T extends Entity<?>> {
         model.insert(appointments);
     }
 
-
     @PutMapping("/update")
     public void update(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
         ModelMapper modelMapper = new ModelMapper();
@@ -85,40 +86,54 @@ public class AppointmentsController<T extends Entity<?>> {
 
     @GetMapping("/list")
     public List<T> list() throws SQLException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
-        List<T> list = model.getAll(new Appointments().getClass());
-        return list;
+        return model.getAll(new Appointments().getClass());
     }
 
-    @GetMapping("/getAppointments")
-    public List<Appointments> getById(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException, InstantiationException {
-        List<Appointments> appointmentsList = new ArrayList<>();
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.addConverter(new StringToDateConverter());
-        Appointments appointments1 = modelMapper.map(requestData, Appointments.class);
-        List<Appointments> appointments = model.getEntityById(appointments1);
-        for (Appointments appointment : appointments) {
-            Appointments newAppointment = new Appointments();
-            BeanUtils.copyProperties(appointment, newAppointment);
+    @GetMapping("/search")
+    public List<Appointments> getByField(@RequestParam Map<String, String> requestParams) {
+        try {
+            List<Appointments> appointmentsList = new ArrayList<>();
+            ModelMapper modelMapper = new ModelMapper();
+            modelMapper.addConverter(new StringToDateConverter());
 
-            // Get and set Staff details
-            Staffs staffs = new Staffs();
-            staffs.setStaff_id(appointment.getStaff_id());
-            newAppointment.setStaff(model.getEntityById(staffs));
+            Appointments appointments1 = modelMapper.map(requestParams, Appointments.class);
+            List<Appointments> appointments = model.getEntityById(appointments1);
 
-            // Get and set Doctor details
-            Doctors doctors = new Doctors();
-            doctors.setDoctor_id(appointment.getDoctor_id());
-            newAppointment.setDoctor(model.getEntityById(doctors));
+            for (Appointments appointment : appointments) {
+                Appointments newAppointment = new Appointments();
+                BeanUtils.copyProperties(appointment, newAppointment);
 
-            // Get and set Patient details
-            Patients patients = new Patients();
-            patients.setPatient_id(appointment.getPatient_id());
-            newAppointment.setPatient(model.getEntityById(patients));
+                if (appointment.getStaff_id() != null) {
+                    Staffs staffsFilter = new Staffs();
+                    staffsFilter.setStaff_id(appointment.getStaff_id());
+                    newAppointment.setStaff(model.getEntityById(staffsFilter));
+                }
 
-            appointmentsList.add(newAppointment);
+                if (appointment.getDoctor_id() != null) {
+                    Doctors doctorsFilter = new Doctors();
+                    doctorsFilter.setDoctor_id(appointment.getDoctor_id());
+                    newAppointment.setDoctor(model.getEntityById(doctorsFilter));
+                }
+
+                if (appointment.getPatient_id() != null) {
+                    Patients patientsFilter = new Patients();
+                    patientsFilter.setPatient_id(appointment.getPatient_id());
+                    newAppointment.setPatient(model.getEntityById(patientsFilter));
+                }
+
+                appointmentsList.add(newAppointment);
+            }
+
+            json.writeEmployeeToJson(appointmentsList, appointments.getClass(), "getbyfields");
+            return appointmentsList;
+        } catch (Exception e) {
+            // Log the exception and return an appropriate error response
+            e.printStackTrace();
+            return new ArrayList<>(); // or return a custom error response
         }
-        return appointmentsList;
     }
+
+
     @GetMapping("/{doctorId}/slots")
     public List<Appointments> getAppointmentsByDoctorId(@PathVariable("doctorId") int doctorId) throws SQLException, IllegalAccessException, InstantiationException {
         Appointments example = new Appointments();
@@ -134,7 +149,6 @@ public class AppointmentsController<T extends Entity<?>> {
 
         return appointmentsList;
     }
-
 
     @PostMapping("/insertAll")
     public void insertAll(@RequestBody List<Map<String, Object>> dataList) throws SQLException, IllegalAccessException {

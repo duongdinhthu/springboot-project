@@ -124,4 +124,23 @@ public class Medicalrecords extends Entity<Integer> {
     public void setDoctors(List<Doctors> doctors) {
         this.doctors = doctors;
     }
+
+    @Override
+    public String toString() {
+        return "Medicalrecords{" +
+                "record_id=" + record_id +
+                ", patient_id=" + patient_id +
+                ", symptoms='" + symptoms + '\'' +
+                ", diagnosis='" + diagnosis + '\'' +
+                ", treatment='" + treatment + '\'' +
+                ", prescription='" + prescription + '\'' +
+                ", follow_up_date=" + follow_up_date +
+                ", doctor_id=" + doctor_id +
+                ", test_urine='" + test_urine + '\'' +
+                ", test_blood='" + test_blood + '\'' +
+                ", x_ray='" + x_ray + '\'' +
+                ", patients=" + patients +
+                ", doctors=" + doctors +
+                '}';
+    }
 }
