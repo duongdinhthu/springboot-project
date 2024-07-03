@@ -54,7 +54,7 @@ public class ChatController {
                 String reply = jsonResponse.getJSONArray("intents").getJSONObject(0).getString("name");
                 return reply;
             } else {
-                return "Không tìm thấy ý định trong phản hồi.";
+                return "Intent not found in response.";
             }
         } catch (Exception e) {
             e.printStackTrace();
