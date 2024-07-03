@@ -14,8 +14,8 @@ public class SendEmailUsername {
         String body = "<html>" +
                 "<head>" +
                 "<style>" +
-                "body { font-family: Arial, sans-serif; }" +
-                ".container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px; }" +
+                "body { font-family: Arial, sans-serif;margin: 0;padding: 0; }" +
+                ".container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
                 ".header { background-color: #436FEC; color: white; padding: 10px; text-align: center; border-radius: 8px 8px 0 0; }" +
                 ".content { padding: 20px; }" +
                 "</style>" +
@@ -26,7 +26,7 @@ public class SendEmailUsername {
                 "<h2>Welcome to FPT Health</h2>" +
                 "</div>" +
                 "<div class='content'>" +
-                "<p>Hi " + name + ",</p>" +
+                "<p>Hi <strong>" + name + "</strong>,</p>" +
                 "<p>To help you manage your medical records, we have created an account for you on the system.</p>" +
                 "<p>Your account details:</p>" +
                 "<ul>" +
@@ -104,8 +104,31 @@ public class SendEmailUsername {
     public static void sendEmailForgot(String name, String email, String code) {
         final String username = "thuddth2307004@fpt.edu.vn";
         final String password = "kyxm zvbz nvsn uxxx";
-        String subject = "Code thay đổi mật khẩu : ";
-        String body = "Xin chào " + name + " mã code để thay đổi mật khẩu của bạn là : " + code;
+        String subject = "Password Reset Request";
+        String body = "<html>" +
+                "<head>" +
+                "<style>" +
+                "body { font-family: Arial, sans-serif;margin: 0;padding: 0; }" +
+                ".container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
+                ".header { background-color: #436FEC; color: white; padding: 10px; text-align: center; border-radius: 8px 8px 0 0; }" +
+                ".content { padding: 20px; }" +
+                "</style>" +
+                "</head>" +
+                "<body>" +
+                "<div class='container'>" +
+                "<div class='header'>" +
+                "<h2>Password Reset Request</h2>" +
+                "</div>" +
+                "<div class='content'>" +
+                "<p>Hi <strong>" + name + "</strong>,</p>" +
+                "<p>We have received a request to retrieve your password. For security purposes, please do not share the code below with anyone.</p>" +
+                "<p>Your verify code is:</p>" +
+                "<h3> " + code + "</h3>" +
+                "<p>If not your request, please ignore this message.</p>" +
+                "</div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -125,7 +148,7 @@ public class SendEmailUsername {
                     InternetAddress.parse(email));
 
             message.setSubject(subject);
-            message.setText(body);
+            message.setContent(body, "text/html; charset=utf-8");
 
             Transport.send(message);
 
