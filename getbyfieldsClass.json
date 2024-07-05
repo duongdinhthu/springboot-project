@@ -1,33 +1,48 @@
 [
   {
-    "record_id": 11,
+    "appointment_id": 2,
     "patient_id": 99,
-    "symptoms": "dau bung",
-    "diagnosis": "ngo doc",
-    "treatment": "Tiem ",
     "doctor_id": 2,
-    "patients": [
+    "appointment_date": "Jan 1, 2024",
+    "medical_day": "Jan 1, 2024",
+    "slot": 5,
+    "status": "pending",
+    "payment_name": "ok",
+    "price": 9.90,
+    "staff_id": 1,
+    "patient": [
       {
         "patient_id": 99,
         "patient_name": "duong dinh thu",
         "patient_email": "thuddth2307004@fpt.edu.vn",
-        "patient_phone": 123456,
-        "patient_address": "tb",
+        "patient_phone": 3211234,
+        "patient_address": "hn",
         "patient_password": "6kXV5pUB",
         "patient_username": "thuddth2307004@fpt.edu.vn",
         "patient_gender": "male"
       }
     ],
-    "doctors": [
+    "doctor": [
       {
         "doctor_id": 2,
         "doctor_name": "Duong Dinh Thu",
         "doctor_phone": 981300594,
-        "doctor_address": "hn",
+        "doctor_address": "HN",
         "doctor_email": "duongthutb94@gmail.com",
         "department_id": 2,
         "doctor_username": "hongphuc",
         "doctor_password": "phuc123"
+      }
+    ],
+    "staff": [
+      {
+        "staff_id": 1,
+        "staff_name": "Nguyen Van A",
+        "staff_phone": 999999999,
+        "staff_address": "TB",
+        "staff_type": "staff",
+        "staff_username": "staff1",
+        "staff_password": "staff1"
       }
     ]
   }

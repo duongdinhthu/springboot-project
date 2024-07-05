@@ -106,7 +106,6 @@ public class AdminController<T extends Entity<?>> {
         List<Entity> objectList = new ArrayList<>();
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
-
         for (DataModel data : dataModelList) {
             // Lấy tên lớp từ data.type
             String className = "springboot.springboot.database.entity." + data.type;
