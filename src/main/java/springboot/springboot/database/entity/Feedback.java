@@ -4,16 +4,15 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 
-public class Feedback  extends Entity<Integer>{
+public class Feedback extends Entity<Integer> {
 
-    private Integer id;
-
+    private int id;
     private String name;
     private String phone;
     private String email;
     private String subject;
     private String message;
-    private LocalDateTime created_at = LocalDateTime.now();
+    private LocalDateTime created_at;
 
     public Feedback() {
     }
@@ -75,4 +74,6 @@ public class Feedback  extends Entity<Integer>{
     public void setCreated_at(LocalDateTime created_at) {
         this.created_at = created_at;
     }
+
+
 }

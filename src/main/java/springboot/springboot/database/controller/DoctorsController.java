@@ -184,4 +184,21 @@ public class DoctorsController<T extends Entity<?>> {
         }
         return medicalrecords;
     }
+    @PostMapping("/login")
+    public ResponseEntity<Doctors> doctorLogin(@RequestBody Map<String, String> requestData) throws SQLException, IllegalAccessException, InstantiationException {
+        String username = requestData.get("username");
+        String password = requestData.get("password");
+
+        Doctors doctorFilter = new Doctors();
+        doctorFilter.setDoctor_username(username);
+        doctorFilter.setDoctor_password(password);
+
+        List<Doctors> doctors = model.getEntityById(doctorFilter);
+        if (doctors.isEmpty()) {
+            return ResponseEntity.status(401).body(null); // Unauthorized
+        }
+
+        Doctors doctor = doctors.get(0);
+        return ResponseEntity.ok(doctor);
+    }
 }

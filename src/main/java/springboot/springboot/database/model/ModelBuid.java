@@ -16,6 +16,7 @@ import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Component
@@ -546,11 +547,18 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
             field.setAccessible(true);
             Object value = rs.getObject(columnName);
             if (value != null) {
-                field.set(newEntity, value);
+                // Kiểm tra nếu trường là LocalDateTime và giá trị là Timestamp
+                if (field.getType().equals(LocalDateTime.class) && value instanceof Timestamp) {
+                    field.set(newEntity, ((Timestamp) value).toLocalDateTime());
+                } else {
+                    field.set(newEntity, value);
+                }
             }
         }
         return newEntity;
     }
+
+
 
     @Override
     public List<T> getEntityById(Entity entity) throws SQLException, IllegalAccessException, InstantiationException {
@@ -797,7 +805,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
     }
 
     public void saveFeedback(Feedback feedback) throws SQLException {
-        String sql = "INSERT INTO feedback (name, phone, email, subject, message, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO feedback (name, phone, email, subject, message, created_at, type) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = openConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, feedback.getName());
@@ -809,5 +817,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
             stmt.executeUpdate();
         }
     }
+
+
 }
 

@@ -158,4 +158,33 @@ public class SendEmailUsername {
             throw new RuntimeException(e);
         }
     }
+    public void sendEmailReply(String name, String email, String message) {
+        final String username = "thuddth2307004@fpt.edu.vn";
+        final String password = "kyxm zvbz nvsn uxxx";
+        String subject = "Reply from Admin";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+        try {
+            Message msg = new MimeMessage(session);
+            msg.setFrom(new InternetAddress(username));
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+            msg.setSubject(subject);
+            msg.setText(message);
+            Transport.send(msg);
+            System.out.println("Email sent successfully");
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
