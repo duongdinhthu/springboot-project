@@ -3,6 +3,7 @@ package springboot.springboot.database.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springboot.springboot.database.entity.*;
 import springboot.springboot.database.model.EntityToJSON;
@@ -167,4 +168,26 @@ public class AppointmentsController<T extends Entity<?>> {
         Constructor<?> constructor = elementType.getConstructor();
         return constructor.newInstance();
     }
+    @PutMapping("/updateStatus")
+    public ResponseEntity<?> updateStatus(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.addConverter(new StringToDateConverter());
+
+        // Lấy thông tin appointment từ requestData
+        Appointments appointments = modelMapper.map(requestData, Appointments.class);
+
+        // Chuyển đổi staff_id từ String sang Integer
+        if (requestData.containsKey("staff_id")) {
+            try {
+                Integer staffId = Integer.valueOf((String) requestData.get("staff_id"));
+                appointments.setStaff_id(staffId);
+            } catch (NumberFormatException e) {
+                return ResponseEntity.badRequest().body("Invalid staff_id format");
+            }
+        }
+
+        model.update(appointments);
+        return ResponseEntity.ok("Appointment status updated successfully");
+    }
+
 }

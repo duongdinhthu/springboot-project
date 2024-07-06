@@ -180,5 +180,27 @@ public class StaffsController<T extends Entity<?>> {
             return ResponseEntity.status(403).body(null); // Forbidden
         }
     }
+    @PostMapping("/loginStaff")
+    public ResponseEntity<Staffs> loginStaff(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException, InstantiationException {
+        String username = (String) requestData.get("username");
+        String password = (String) requestData.get("password");
+
+        Staffs staffFilter = new Staffs();
+        staffFilter.setStaff_username(username); // Giả sử Staffs có thuộc tính username
+        staffFilter.setStaff_password(password); // Giả sử Staffs có thuộc tính password
+
+        List<Staffs> staffs = model.getEntityById(staffFilter);
+        if (staffs.isEmpty()) {
+            return ResponseEntity.status(401).body(null); // Unauthorized
+        }
+
+        Staffs staff = staffs.get(0);
+        if ("staff".equals(staff.getStaff_type())) {
+            return ResponseEntity.ok(staff);
+        } else {
+            return ResponseEntity.status(403).body(null); // Forbidden
+        }
+    }
+
 
 }

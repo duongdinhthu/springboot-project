@@ -6,7 +6,7 @@
     "appointment_date": "Jan 1, 2024",
     "medical_day": "Jul 27, 2024",
     "slot": 5,
-    "status": "pending",
+    "status": "access",
     "payment_name": "ok",
     "price": 9.90,
     "staff_id": 1,
