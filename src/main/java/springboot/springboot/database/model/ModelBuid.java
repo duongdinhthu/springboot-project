@@ -36,9 +36,13 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
 
 
     public static PreparedStatement openPstm(String query) throws SQLException {
+        if (pstm != null && !pstm.isClosed()) {
+            pstm.close();
+        }
         pstm = openConnection().prepareStatement(query);
         return pstm;
     }
+
 
     public static boolean exUpdate() throws SQLException {
         int check = pstm.executeUpdate();
@@ -560,55 +564,76 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
 
 
 
+
     @Override
     public List<T> getEntityById(Entity entity) throws SQLException, IllegalAccessException, InstantiationException {
         List<T> entityList = new ArrayList<>(); // Khai báo và khởi tạo entityList
 
         String query = queryGetEntityById(entity).toString();
-        System.out.println(query);
-        openPstm(query);
+        System.out.println("SQL Query: " + query);
 
-        Field[] fields = entity.getClass().getDeclaredFields();
-        List<Field> validFields = new ArrayList<>();
+        // Đảm bảo rằng PreparedStatement và ResultSet được quản lý tốt
+        try (PreparedStatement pstm = openPstm(query)) {
+            Field[] fields = entity.getClass().getDeclaredFields();
+            List<Field> validFields = new ArrayList<>();
 
-        for (Field f : fields) {
-            f.setAccessible(true);
-            Object val = f.get(entity);
-            if (val != null && !"0".equals(val.toString())) {
-                validFields.add(f);
-            }
-        }
-        int index = 1;
-        for (Field f : validFields) {
-            Object val = f.get(entity);
-            pstm.setObject(index, val);
-            index++;
-        }
-        ResultSet rs = exQuery();
-
-        while (rs.next()) {
-            T newEntity = (T) entity.getClass().newInstance();
-            for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                String columnName = rs.getMetaData().getColumnName(i);
-                for (Field field : fields) {
-                    field.setAccessible(true);
-                    if (field.getName().equals(columnName)) {
-                        Object fieldValue = rs.getObject(i);
-                        // Kiểm tra nếu fieldValue là null và kiểu dữ liệu của field là nguyên thủy (như int)
-                        if (fieldValue == null && field.getType().isPrimitive()) {
-                            // Nếu fieldValue là null và field là nguyên thủy, bỏ qua việc thiết lập giá trị
-                            continue;
-                        }
-                        field.set(newEntity, fieldValue);
-                        break;
-                    }
+            for (Field f : fields) {
+                f.setAccessible(true);
+                Object val = f.get(entity);
+                if (val != null && !"0".equals(val.toString())) {
+                    validFields.add(f);
                 }
             }
-            entityList.add(newEntity);
+
+            int index = 1;
+            for (Field f : validFields) {
+                Object val = f.get(entity);
+                pstm.setObject(index, val);
+                index++;
+            }
+
+            try (ResultSet rs = pstm.executeQuery()) {
+                if (rs == null) {
+                    throw new SQLException("ResultSet is null");
+                }
+
+                ResultSetMetaData metaData = rs.getMetaData();
+                if (metaData == null) {
+                    throw new SQLException("ResultSetMetaData is null");
+                }
+
+                System.out.println("Column Count: " + metaData.getColumnCount());
+
+                while (rs.next()) {
+                    T newEntity = (T) entity.getClass().newInstance();
+                    for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                        String columnName = metaData.getColumnName(i);
+                        for (Field field : fields) {
+                            field.setAccessible(true);
+                            if (field.getName().equals(columnName)) {
+                                Object fieldValue = rs.getObject(i);
+                                // Kiểm tra nếu fieldValue là null và kiểu dữ liệu của field là nguyên thủy (như int)
+                                if (fieldValue == null && field.getType().isPrimitive()) {
+                                    // Nếu fieldValue là null và field là nguyên thủy, bỏ qua việc thiết lập giá trị
+                                    continue;
+                                }
+                                field.set(newEntity, fieldValue);
+                                break;
+                            }
+                        }
+                    }
+                    entityList.add(newEntity);
+                }
+            }
         }
 
         return entityList;
     }
+
+
+
+
+
 
 
     public T getManyToOne(Entity entity) throws SQLException, IllegalAccessException, InstantiationException {

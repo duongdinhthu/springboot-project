@@ -79,6 +79,7 @@ public class DepartmentsController<T extends Entity<?>> {
         }
     }
 
+
     @GetMapping("/{departmentId}/doctors")
     public List<Doctors> getDoctorsByDepartmentId(@PathVariable("departmentId") int departmentId) throws SQLException, IllegalAccessException, InstantiationException {
         Doctors doctors = new Doctors();
