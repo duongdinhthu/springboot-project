@@ -1,21 +1,45 @@
 [
   {
-    "department_id": 2,
-    "department_name": "nerve",
-    "location": "2nd floor",
-    "department_img": "ok",
-    "department_description": "bac si khoa nay gioi vcl",
-    "doctorsList": [
+    "patient_id": 107,
+    "patient_name": "duong dinh thu",
+    "patient_email": "ok@gmail.com",
+    "patient_phone": 12345623,
+    "patient_address": "Thai Binh",
+    "patient_password": "SVl7o80n",
+    "patient_username": "ok@gmail.com",
+    "appointmentsList": [
       {
+        "appointment_id": 46,
+        "patient_id": 107,
         "doctor_id": 2,
-        "doctor_name": "Duong Dinh Thu",
-        "doctor_phone": 981300594,
-        "doctor_address": "HN",
-        "doctor_email": "duongthutb94@gmail.com",
-        "department_id": 2,
-        "doctor_username": "hongphuc",
-        "doctor_password": "phuc123"
+        "appointment_date": "Jul 6, 2024",
+        "medical_day": "Jul 4, 2024",
+        "slot": 4,
+        "status": "Pending",
+        "doctor": [
+          {
+            "doctor_id": 2,
+            "doctor_name": "Duong Dinh Thu",
+            "doctor_phone": 981300594,
+            "doctor_address": "HN",
+            "doctor_email": "duongthutb94@gmail.com",
+            "department_id": 2,
+            "doctor_username": "hongphuc",
+            "doctor_password": "phuc123",
+            "department": [
+              {
+                "department_id": 2,
+                "department_name": "nerve",
+                "location": "2nd floor",
+                "department_img": "ok",
+                "department_description": "bac si khoa nay gioi vcl"
+              }
+            ]
+          }
+        ]
       }
-    ]
+    ],
+    "medicalrecordsList": [],
+    "patient_gender": "male"
   }
 ]
