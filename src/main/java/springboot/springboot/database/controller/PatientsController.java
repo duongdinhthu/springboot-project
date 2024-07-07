@@ -103,12 +103,16 @@ public class PatientsController<T extends Entity<?>> {
         List<Patients> patients = model.getEntityById(patientExample);
 
         if (!patients.isEmpty()) {
-            Patients patient = patients.get(0); // Lấy thông tin bệnh nhân đầu tiên (nếu có nhiều)
-            return ResponseEntity.ok(Collections.singletonMap("username", patient.getPatient_name()));
+            Patients patient = patients.get(0);
+            Map<String, Object> response = new HashMap<>();
+            response.put("username", patient.getPatient_name());
+            response.put("patient_id", patient.getPatient_id()); // Thêm patient_id vào phản hồi
+            return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("success", false));
         }
     }
+
 
     @PostMapping("/google-login")
     public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> request) throws Exception {
@@ -267,4 +271,5 @@ public class PatientsController<T extends Entity<?>> {
         }
         return medicalrecords;
     }
+
 }
