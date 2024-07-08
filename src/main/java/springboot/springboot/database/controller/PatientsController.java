@@ -119,7 +119,7 @@ public class PatientsController<T extends Entity<?>> {
         String email = request.get("email");
         String name = request.get("name");
         String password = request.get("password");
-
+        System.out.println("gglogin");
         Patients patient = new Patients();
         patient.setPatient_email(email);
 

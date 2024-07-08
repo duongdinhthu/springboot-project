@@ -830,7 +830,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
     }
 
     public void saveFeedback(Feedback feedback) throws SQLException {
-        String sql = "INSERT INTO feedback (name, phone, email, subject, message, created_at, type) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO feedback (name, phone, email, subject, message, created_at) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connection = openConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, feedback.getName());
@@ -839,6 +839,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
             stmt.setString(4, feedback.getSubject());
             stmt.setString(5, feedback.getMessage());
             stmt.setTimestamp(6, Timestamp.valueOf(feedback.getCreated_at()));
+            
             stmt.executeUpdate();
         }
     }

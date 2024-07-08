@@ -14,6 +14,7 @@ public class Feedback extends Entity<Integer> {
     private String message;
     private LocalDateTime created_at;
 
+
     public Feedback() {
     }
 // Getters and setters
