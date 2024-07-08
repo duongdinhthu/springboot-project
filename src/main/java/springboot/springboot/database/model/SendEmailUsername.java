@@ -124,7 +124,6 @@ public class SendEmailUsername {
                 "<p>We have received a request to retrieve your password. For security purposes, please do not share the code below with anyone.</p>" +
                 "<p>Your verify code is:</p>" +
                 "<h3> " + code + "</h3>" +
-                "<p>If not your request, please ignore this message.</p>" +
                 "</div>" +
                 "</div>" +
                 "</body>" +
