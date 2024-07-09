@@ -71,7 +71,6 @@ public class DepartmentsController<T extends Entity<?>> {
                 departmentsList.add(newDepartment);
             }
 
-            json.writeEmployeeToJson(departmentsList, departments.getClass(), "getbyfields");
             return departmentsList;
         } catch (Exception e) {
             e.printStackTrace();

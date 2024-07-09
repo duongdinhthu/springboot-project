@@ -90,7 +90,7 @@ public class DoctorsController<T extends Entity<?>> {
                 doctorsList.add(newDoctor);
             }
 
-            json.writeEmployeeToJson(doctorsList, doctors.getClass(), "getbyfields");
+
             return doctorsList;
         } catch (Exception e) {
             // Log the exception and return an appropriate error response

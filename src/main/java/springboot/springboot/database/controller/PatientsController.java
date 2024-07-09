@@ -88,7 +88,6 @@ public class PatientsController<T extends Entity<?>> {
             patientsList.add(newPatient);
         }
 
-        json.writeEmployeeToJson(patientsList, patients.getClass(), "getbyfields");
         return patientsList;
     }
 

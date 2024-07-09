@@ -79,7 +79,6 @@ public class StaffsController<T extends Entity<?>> {
                 staffsList.add(newStaff);
             }
 
-            json.writeEmployeeToJson(staffsList, staffs.getClass(), "getbyfields");
             return staffsList;
         } catch (Exception e) {
             // Log the exception and return an appropriate error response

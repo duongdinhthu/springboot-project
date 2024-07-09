@@ -93,7 +93,7 @@ public class MedicalrecordsController<T extends Entity<?>> {
                 medicalrecordsList.add(newRecord);
             }
 
-            json.writeEmployeeToJson(medicalrecordsList, medicalrecords.getClass(), "getbyfields");
+
             return medicalrecordsList;
         } catch (Exception e) {
             e.printStackTrace();

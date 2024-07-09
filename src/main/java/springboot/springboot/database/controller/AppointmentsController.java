@@ -125,7 +125,6 @@ public class AppointmentsController<T extends Entity<?>> {
                 appointmentsList.add(newAppointment);
             }
 
-            json.writeEmployeeToJson(appointmentsList, appointments.getClass(), "getbyfields");
             return appointmentsList;
         } catch (Exception e) {
             // Log the exception and return an appropriate error response
