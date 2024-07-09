@@ -1,5 +1,6 @@
 package springboot.springboot.database.entity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class Doctors extends Entity<Integer> {
@@ -11,6 +12,9 @@ public class Doctors extends Entity<Integer> {
     private Integer department_id;
     private String doctor_username;
     private String doctor_password;
+    private String summary;
+    private String doctor_image;
+    private BigDecimal doctor_price;
     private List<Departments> department;
     private List<Appointments> appointmentsList;
     private List<Medicalrecords> medicalrecordsList;
@@ -20,6 +24,30 @@ public class Doctors extends Entity<Integer> {
 
     // Getters and Setters
 
+
+    public BigDecimal getDoctor_price() {
+        return doctor_price;
+    }
+
+    public void setDoctor_price(BigDecimal doctor_price) {
+        this.doctor_price = doctor_price;
+    }
+
+    public String getDoctor_image() {
+        return doctor_image;
+    }
+
+    public void setDoctor_image(String doctor_image) {
+        this.doctor_image = doctor_image;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
 
     public Integer getDoctor_id() {
         return doctor_id;
@@ -107,5 +135,24 @@ public class Doctors extends Entity<Integer> {
 
     public void setMedicalrecordsList(List<Medicalrecords> medicalrecordsList) {
         this.medicalrecordsList = medicalrecordsList;
+    }
+
+    @Override
+    public String toString() {
+        return "Doctors{" +
+                "doctor_id=" + doctor_id +
+                ", doctor_name='" + doctor_name + '\'' +
+                ", doctor_phone=" + doctor_phone +
+                ", doctor_address='" + doctor_address + '\'' +
+                ", doctor_email='" + doctor_email + '\'' +
+                ", department_id=" + department_id +
+                ", doctor_username='" + doctor_username + '\'' +
+                ", doctor_password='" + doctor_password + '\'' +
+                ", summary='" + summary + '\'' +
+                ", doctor_image='" + doctor_image + '\'' +
+                ", department=" + department +
+                ", appointmentsList=" + appointmentsList +
+                ", medicalrecordsList=" + medicalrecordsList +
+                '}';
     }
 }

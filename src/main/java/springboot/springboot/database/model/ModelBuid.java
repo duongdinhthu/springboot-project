@@ -622,6 +622,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
                             }
                         }
                     }
+                    System.out.println(newEntity.toString());
                     entityList.add(newEntity);
                 }
             }
@@ -839,11 +840,8 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
             stmt.setString(4, feedback.getSubject());
             stmt.setString(5, feedback.getMessage());
             stmt.setTimestamp(6, Timestamp.valueOf(feedback.getCreated_at()));
-            
             stmt.executeUpdate();
         }
     }
-
-
 }
 

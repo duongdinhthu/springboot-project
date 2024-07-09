@@ -62,7 +62,7 @@ public class DepartmentsController<T extends Entity<?>> {
             for (Departments department : departments) {
                 Departments newDepartment = new Departments();
                 BeanUtils.copyProperties(department, newDepartment);
-
+                System.out.println(newDepartment.toString());
                 Doctors doctorsFilter = new Doctors();
                 doctorsFilter.setDepartment_id(department.getDepartment_id());
                 List<Doctors> doctorsList = model.getEntityById(doctorsFilter);
@@ -84,6 +84,7 @@ public class DepartmentsController<T extends Entity<?>> {
     public List<Doctors> getDoctorsByDepartmentId(@PathVariable("departmentId") int departmentId) throws SQLException, IllegalAccessException, InstantiationException {
         Doctors doctors = new Doctors();
         doctors.setDepartment_id(departmentId);
+
         return model.getEntityById(doctors);
     }
 

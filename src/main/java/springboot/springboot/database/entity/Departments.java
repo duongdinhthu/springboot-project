@@ -2,19 +2,29 @@ package springboot.springboot.database.entity;
 
 import java.util.List;
 
-public class Departments extends Entity<Integer>{
+public class Departments extends Entity<Integer> {
     private Integer department_id;
     private String department_name;
     private String location;
-private String department_img;
-private String department_description;
+    private String department_img;
+    private String department_description;
+    private String summary;
     private List<Doctors> doctorsList;
+
     public Departments(String department_name, String location) {
         this.department_name = department_name;
         this.location = location;
     }
 
     public Departments() {
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     public Integer getDepartment_id() {
@@ -63,5 +73,18 @@ private String department_description;
 
     public void setDepartment_description(String department_description) {
         this.department_description = department_description;
+    }
+
+    @Override
+    public String toString() {
+        return "Departments{" +
+                "department_id=" + department_id +
+                ", department_name='" + department_name + '\'' +
+                ", location='" + location + '\'' +
+                ", department_img='" + department_img + '\'' +
+                ", department_description='" + department_description + '\'' +
+                ", summary='" + summary + '\'' +
+                ", doctorsList=" + doctorsList +
+                '}';
     }
 }
