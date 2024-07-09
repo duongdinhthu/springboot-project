@@ -30,7 +30,6 @@ public class ChatController {
         String url = WIT_AI_API_URL + userMessage;
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", WIT_AI_AUTH_TOKEN);
-
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
