@@ -270,5 +270,33 @@ public class PatientsController<T extends Entity<?>> {
         }
         return medicalrecords;
     }
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody Map<String, String> registerRequest) throws Exception {
+        ModelMapper modelMapper = new ModelMapper();
+
+        // Map các trường từ request sang đối tượng Patients
+        Patients newPatient = modelMapper.map(registerRequest, Patients.class);
+
+        // In ra các giá trị để kiểm tra
+        System.out.println("patient_name: " + newPatient.getPatient_name());
+        System.out.println("patient_email: " + newPatient.getPatient_email());
+        System.out.println("patient_password: " + newPatient.getPatient_password());
+        System.out.println("patient_username: " + newPatient.getPatient_username());
+
+        // Kiểm tra xem email đã được sử dụng chưa
+        Patients existingPatient = new Patients();
+        existingPatient.setPatient_email(newPatient.getPatient_email());
+
+        List<Patients> patientsList = model.getEntityById(existingPatient);
+
+        if (!patientsList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already registered.");
+        }
+
+        // Lưu trữ đối tượng mới vào cơ sở dữ liệu
+        model.insert(newPatient);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(Collections.singletonMap("username", newPatient.getPatient_name()));
+    }
 
 }

@@ -115,4 +115,22 @@ public class Patients extends Entity<Integer> {
     public void setPatient_code(String patient_code) {
         this.patient_code = patient_code;
     }
+
+    @Override
+    public String toString() {
+        return "Patients{" +
+                "patient_id=" + patient_id +
+                ", patient_name='" + patient_name + '\'' +
+                ", patient_dob=" + patient_dob +
+                ", patient_email='" + patient_email + '\'' +
+                ", patient_phone=" + patient_phone +
+                ", patient_address='" + patient_address + '\'' +
+                ", patient_password='" + patient_password + '\'' +
+                ", patient_username='" + patient_username + '\'' +
+                ", appointmentsList=" + appointmentsList +
+                ", medicalrecordsList=" + medicalrecordsList +
+                ", patient_gender='" + patient_gender + '\'' +
+                ", patient_code='" + patient_code + '\'' +
+                '}';
+    }
 }
