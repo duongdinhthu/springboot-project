@@ -78,7 +78,6 @@ public class StaffsController<T extends Entity<?>> {
                 newStaff.setAppointmentsList(appointments);
                 staffsList.add(newStaff);
             }
-
             return staffsList;
         } catch (Exception e) {
             // Log the exception and return an appropriate error response
