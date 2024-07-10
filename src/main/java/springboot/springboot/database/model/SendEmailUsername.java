@@ -15,7 +15,7 @@ public class SendEmailUsername {
                 "<head>" +
                 "<style>" +
                 "body { font-family: Arial, sans-serif;margin: 0;padding: 0; }" +
-                ".container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
+                ".container { max-width: 600px; height: fit-content; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
                 ".header { background-color: #436FEC; color: white; padding: 10px; text-align: center; border-radius: 8px 8px 0 0; }" +
                 ".content { padding: 20px; }" +
                 "</style>" +
@@ -27,13 +27,13 @@ public class SendEmailUsername {
                 "</div>" +
                 "<div class='content'>" +
                 "<p>Hi <strong>" + name + "</strong>,</p>" +
-                "<p>To help you manage your medical records, we have created an account for you on the system.</p>" +
+                "<p>To help you manage your medical records, we have created an account for you on the system. You can log in at any time to review your medical records.</p>" +
                 "<p>Your account details:</p>" +
                 "<ul>" +
                 "<li><strong>Username:</strong> " + email + "</li>" +
                 "<li><strong>Password:</strong> " + passwordpatient + "</li>" +
                 "</ul>" +
-                "<p>You can log in at any time to review your medical records.</p>" +
+                "<p>We recommend logging in to update your password for security reasons.</p>" +
                 "</div>" +
                 "</div>" +
                 "</body>" +
@@ -109,7 +109,7 @@ public class SendEmailUsername {
                 "<head>" +
                 "<style>" +
                 "body { font-family: Arial, sans-serif;margin: 0;padding: 0; }" +
-                ".container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
+                ".container { max-width: 600px; height: fit-content; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
                 ".header { background-color: #436FEC; color: white; padding: 10px; text-align: center; border-radius: 8px 8px 0 0; }" +
                 ".content { padding: 20px; }" +
                 "</style>" +
