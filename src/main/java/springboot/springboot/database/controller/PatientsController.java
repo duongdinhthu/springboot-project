@@ -133,8 +133,13 @@ public class PatientsController<T extends Entity<?>> {
             patient = patientsList.get(0);
         }
 
-        return ResponseEntity.ok(Collections.singletonMap("username", patient.getPatient_name()));
+        Map<String, Object> response = new HashMap<>();
+        response.put("username", patient.getPatient_name());
+        response.put("patient_id", patient.getPatient_id()); // Thêm patient_id vào phản hồi
+
+        return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/facebook-login")
     public ResponseEntity<?> facebookLogin(@RequestBody Map<String, String> request) throws Exception {
@@ -181,8 +186,13 @@ public class PatientsController<T extends Entity<?>> {
             patient = patientsList.get(0);
         }
 
-        return ResponseEntity.ok(Collections.singletonMap("username", patient.getPatient_name()));
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("username", patient.getPatient_name());
+        responseBody.put("patient_id", patient.getPatient_id()); // Thêm patient_id vào phản hồi
+
+        return ResponseEntity.ok(responseBody);
     }
+
 
 
     @PostMapping("/insertAll")
