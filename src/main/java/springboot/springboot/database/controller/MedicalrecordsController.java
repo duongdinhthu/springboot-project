@@ -12,10 +12,8 @@ import springboot.springboot.database.model.ModelBuid;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/medicalrecords")
@@ -114,4 +112,13 @@ public class MedicalrecordsController<T extends Entity<?>> {
         }
         return childFieldNames;
     }
+    @GetMapping("/fields")
+    public ResponseEntity<List<String>> getMedicalRecordFields() {
+        Field[] fields = Medicalrecords.class.getDeclaredFields();
+        List<String> fieldNames = Arrays.stream(fields)
+                .map(Field::getName)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(fieldNames);
+    }
+
 }

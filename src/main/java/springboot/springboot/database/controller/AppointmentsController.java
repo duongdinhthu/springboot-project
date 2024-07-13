@@ -11,11 +11,14 @@ import springboot.springboot.database.model.ModelBuid;
 import springboot.springboot.database.model.SendEmailUsername;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/appointments")
@@ -188,5 +191,30 @@ public class AppointmentsController<T extends Entity<?>> {
         model.update(appointments);
         return ResponseEntity.ok("Appointment status updated successfully");
     }
-
+    @GetMapping("/fields")
+    public ResponseEntity<List<String>> getAppointmentFields() {
+        Field[] fields = Appointments.class.getDeclaredFields();
+        List<String> fieldNames = Arrays.stream(fields)
+                .map(Field::getName)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(fieldNames);
+    }
+    @PostMapping("/send-email")
+    public ResponseEntity<?> sendEmail(@RequestBody Map<String, String> emailData) {
+        try {
+            String doctorName = emailData.get("doctorName");
+            String departmentName = emailData.get("departmentName");
+            String medicalDay = emailData.get("medicalDay");
+            String patientEmail = emailData.get("patientEmail");
+            String patientName = emailData.get("patientName");
+            String timeSlot = emailData.get("timeSlot");
+            System.out.println(doctorName+","+departmentName+","+medicalDay+","+patientEmail+","+patientName+","+timeSlot);
+            // Gửi email với thông tin đã nhận
+            sendEmail.sendEmailFormRegister(doctorName, departmentName, medicalDay, patientEmail, patientName,timeSlot);
+            return ResponseEntity.ok("Email sent successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error sending email");
+        }
+    }
 }

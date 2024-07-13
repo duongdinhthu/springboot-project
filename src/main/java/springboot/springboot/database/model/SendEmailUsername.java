@@ -66,13 +66,13 @@ public class SendEmailUsername {
         }
     }
 
-    public void sendEmailFormRegister(String doctorName, String departmentName, String appointmentDate, String patientEmail, String patientName) {
+    public void sendEmailFormRegister(String doctorName, String departmentName, String medicalDay, String patientEmail, String patientName,String timeSlot) {
         final String username = "thuddth2307004@fpt.edu.vn";
         final String password = "kyxm zvbz nvsn uxxx";
         String subject = "Chúc mừng bạn đã đăng kí khám thành công tại FPT Health ";
         String body = "Xin chào " + patientName + " , bạn đã đặt khám thành công tại FPT Health , Khoa khám bệnh của bạn là: " + departmentName +
-                "Bác sĩ khám cho bạn là: " + doctorName + "Ngày khám của bạn là:" + appointmentDate
-                + " Nhân viên của chúng tôi sẽ liên hệ với bạn để huướng dẫn bạn chi tiết . Trân trọng !";
+                "Bác sĩ khám cho bạn là: " + doctorName + "Ngày khám của bạn là:" + medicalDay
+                +"Giờ khám của bạn là:"+timeSlot +" Nhân viên của chúng tôi sẽ liên hệ với bạn để huướng dẫn bạn chi tiết . Trân trọng !";
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");

@@ -12,10 +12,7 @@ import springboot.springboot.database.model.ModelBuid;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/doctors")
@@ -70,7 +67,6 @@ public class DoctorsController<T extends Entity<?>> {
             for (Doctors doctor : doctors) {
                 Doctors newDoctor = new Doctors();
                 BeanUtils.copyProperties(doctor, newDoctor);
-
                 Medicalrecords medicalrecordsFilter = new Medicalrecords();
                 medicalrecordsFilter.setDoctor_id(doctor.getDoctor_id());
                 List<Medicalrecords> medicalrecordsList = model.getEntityById(medicalrecordsFilter);
@@ -169,7 +165,13 @@ public class DoctorsController<T extends Entity<?>> {
         }
         return appointments;
     }
-
+    @GetMapping("/{doctorId}/medicalrecords")
+    public ResponseEntity<List<Medicalrecords>> getMedicalByDoctorId(@PathVariable int doctorId) throws SQLException, IllegalAccessException, InstantiationException {
+        Medicalrecords medicalrecords = new Medicalrecords();
+        medicalrecords.setDoctor_id(doctorId);
+        List<Medicalrecords> medicalrecordsList = model.getEntityById(medicalrecords);
+        return ResponseEntity.ok(medicalrecords(medicalrecordsList));
+    }
     public List<Medicalrecords> medicalrecords(List<Medicalrecords> medicalrecordsList) throws SQLException, IllegalAccessException, InstantiationException {
         List<Medicalrecords> medicalrecords = new ArrayList<>();
         for (Medicalrecords medicalrecord : medicalrecordsList) {
@@ -185,7 +187,7 @@ public class DoctorsController<T extends Entity<?>> {
         return medicalrecords;
     }
     @PostMapping("/login")
-    public ResponseEntity<Doctors> doctorLogin(@RequestBody Map<String, String> requestData) throws SQLException, IllegalAccessException, InstantiationException {
+    public ResponseEntity<Map<String, Object>> doctorLogin(@RequestBody Map<String, String> requestData) throws SQLException, IllegalAccessException, InstantiationException {
         String username = requestData.get("username");
         String password = requestData.get("password");
 
@@ -199,6 +201,28 @@ public class DoctorsController<T extends Entity<?>> {
         }
 
         Doctors doctor = doctors.get(0);
-        return ResponseEntity.ok(doctor);
+
+        // Prepare the response map
+        Map<String, Object> response = new HashMap<>();
+        response.put("doctor_id", doctor.getDoctor_id());
+        response.put("doctor_name", doctor.getDoctor_name());
+        response.put("doctor_description", doctor.getDoctor_description());
+        response.put("department_id", doctor.getDepartment_id());
+        response.put("doctor_username", doctor.getDoctor_username());
+        response.put("doctor_password", doctor.getDoctor_password());
+        response.put("summary", doctor.getSummary());
+        // Add other fields as needed
+
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<Doctors> getDoctorById(@PathVariable int id) throws SQLException, IllegalAccessException, InstantiationException {
+        Doctors doctorFilter = new Doctors();
+        doctorFilter.setDoctor_id(id);
+        List<Doctors> doctors = model.getEntityById(doctorFilter);
+        if (doctors.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(doctors.get(0));
     }
 }

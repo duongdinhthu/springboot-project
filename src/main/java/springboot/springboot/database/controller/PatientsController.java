@@ -194,7 +194,6 @@ public class PatientsController<T extends Entity<?>> {
     }
 
 
-
     @PostMapping("/insertAll")
     public void insertAll(@RequestBody List<Map<String, Object>> dataList) throws SQLException, IllegalAccessException {
         List<Patients> patientsList = new ArrayList<>();
@@ -280,6 +279,7 @@ public class PatientsController<T extends Entity<?>> {
         }
         return medicalrecords;
     }
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> registerRequest) throws Exception {
         ModelMapper modelMapper = new ModelMapper();
@@ -308,5 +308,4 @@ public class PatientsController<T extends Entity<?>> {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(Collections.singletonMap("username", newPatient.getPatient_name()));
     }
-
 }
