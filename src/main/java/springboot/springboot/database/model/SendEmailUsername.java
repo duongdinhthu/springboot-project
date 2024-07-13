@@ -185,5 +185,41 @@ public class SendEmailUsername {
             throw new RuntimeException(e);
         }
     }
+    public void sendEmailToDoctor(String doctorName, String departmentName, String appointmentDate, String doctorEmail, String patientName, String timeSlot) {
+        final String username = "thuddth2307004@fpt.edu.vn";
+        final String password = "kyxm zvbz nvsn uxxx";
+        String subject = "Thông báo lịch khám mới từ FPT Health";
+        String body = "Xin chào bác sĩ " + doctorName + ", bạn có một lịch khám mới tại FPT Health. Khoa khám bệnh: " + departmentName +
+                ", bệnh nhân: " + patientName + ", ngày khám: " + appointmentDate +
+                ", giờ khám: " + timeSlot +
+                ". Vui lòng kiểm tra và chuẩn bị. Trân trọng!";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress("thuddth2307004@fpt.edu.vn"));
+            message.setRecipients(Message.RecipientType.TO,
+                    InternetAddress.parse(doctorEmail));
+            message.setSubject(subject);
+            message.setText(body);
+            Transport.send(message);
+
+            System.out.println("Email sent to doctor successfully");
+
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

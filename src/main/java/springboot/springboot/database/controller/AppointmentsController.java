@@ -217,4 +217,31 @@ public class AppointmentsController<T extends Entity<?>> {
             return ResponseEntity.status(500).body("Error sending email");
         }
     }
+    @PostMapping("/send-email-doctor")
+    public ResponseEntity<?> sendEmailToDoctor(@RequestBody Map<String, String> emailData) {
+        try {
+            String doctorName = emailData.get("doctorName");
+            String departmentName = emailData.get("departmentName");
+            String appointmentDate = emailData.get("medicalDay");
+            String doctorEmail = emailData.get("doctorEmail");
+            String patientName = emailData.get("patientName");
+            String timeSlot = emailData.get("timeSlot");
+
+            // In ra các giá trị nhận được để kiểm tra
+            System.out.println("Doctor Name: " + doctorName);
+            System.out.println("Department Name: " + departmentName);
+            System.out.println("Appointment Date: " + appointmentDate);
+            System.out.println("Doctor Email: " + doctorEmail);
+            System.out.println("Patient Name: " + patientName);
+            System.out.println("Time Slot: " + timeSlot);
+
+            sendEmail.sendEmailToDoctor(doctorName, departmentName, appointmentDate, doctorEmail, patientName, timeSlot);
+            return ResponseEntity.ok("Email sent to doctor successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error sending email to doctor");
+        }
+    }
+
+
 }
