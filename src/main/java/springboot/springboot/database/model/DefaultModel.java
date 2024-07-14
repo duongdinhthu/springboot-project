@@ -5,9 +5,12 @@ import org.reflections.util.ConfigurationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.reflections.Reflections;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import springboot.springboot.database.entity.Entity;
+import springboot.springboot.database.connectDTB.MySqlConnect;
 import springboot.springboot.database.entity.Feedback;
+
 
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
@@ -17,34 +20,43 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Component
-public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
+public class DefaultModel<T extends Entity<?>> implements ModelBuidDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private DataSource dataSource;
+    private List<T> entities = new ArrayList<>();// T dai dien cho cac thuc the entity( Product, Customer....)
+    public static Connection connection;
 
-    private List<T> entities = new ArrayList<>();
-
-    public Connection openConnection() throws SQLException {
-        return dataSource.getConnection();
+    public static Connection openConnection() throws SQLException {
+        connection = MySqlConnect.getMySQLConnection();
+        return connection;
     }
 
-    public PreparedStatement openPstm(String query, Connection connection) throws SQLException {
-        return connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+    public static PreparedStatement pstm;
+
+
+    public static PreparedStatement openPstm(String query) throws SQLException {
+        if (pstm != null && !pstm.isClosed()) {
+            pstm.close();
+        }
+        pstm = openConnection().prepareStatement(query);
+        return pstm;
     }
 
-    public boolean exUpdate(PreparedStatement pstm) throws SQLException {
+
+    public static boolean exUpdate() throws SQLException {
         int check = pstm.executeUpdate();
         return check > 0;
     }
 
-    public ResultSet exQuery(PreparedStatement pstm) throws SQLException {
-        return pstm.executeQuery();
+    public static ResultSet exQuery() throws SQLException {
+        ResultSet rs = pstm.executeQuery();
+        return rs;
     }
 
     private String getTableName(Class<T> entityClass) {
-        return entityClass.getSimpleName();
+        String tableName = entityClass.getSimpleName();
+        return tableName;
     }
 
     private StringBuilder queryInsert(Entity entity) {
@@ -81,8 +93,15 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
             query.append("?");
         }
         query.append(")");
+        // In ra các trường và giá trị của chúng
+        for (int i = 0; i < includedFields.size(); i++) {
+            System.out.println(includedFields.get(i).getName());
+            System.out.println(fieldValues.get(i));
+        }
+
         return query;
     }
+
 
     private StringBuilder queryUpdate(Entity entity) {
         String tableName = getTableName((Class<T>) entity.getClass());
@@ -171,17 +190,20 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         StringBuilder query = queryGetAll(entity);
         Object[] params = extractParams(entity);
 
-        return jdbcTemplate.query(query.toString(), params, (rs, rowNum) -> {
-            try {
-                Entity resultEntity = entity.getClass().newInstance();
-                Field[] fields = entity.getClass().getDeclaredFields();
-                for (Field field : fields) {
-                    field.setAccessible(true);
-                    field.set(resultEntity, rs.getObject(field.getName()));
+        return jdbcTemplate.query(query.toString(), params, new RowMapper<Entity>() {
+            @Override
+            public Entity mapRow(ResultSet rs, int rowNum) throws SQLException {
+                try {
+                    Entity resultEntity = entity.getClass().newInstance();
+                    Field[] fields = entity.getClass().getDeclaredFields();
+                    for (Field field : fields) {
+                        field.setAccessible(true);
+                        field.set(resultEntity, rs.getObject(field.getName()));
+                    }
+                    return resultEntity;
+                } catch (InstantiationException | IllegalAccessException e) {
+                    throw new SQLException("Error mapping row to entity", e);
                 }
-                return resultEntity;
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new SQLException("Error mapping row to entity", e);
             }
         });
     }
@@ -393,50 +415,55 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
     public int insert(Entity entity) throws SQLException, IllegalAccessException {
         Field[] fields = entity.getClass().getDeclaredFields();
         String query = queryInsert(entity).toString();
-        try (Connection connection = openConnection();
-             PreparedStatement preparedStatement = openPstm(query, connection)) {
-            System.out.println(query);
-            int parameterIndex = 1;
-            for (Field field : fields) {
-                field.setAccessible(true);
-                Object value = field.get(entity);
-                if (value != null && !"0".equals(value.toString())) {
-                    preparedStatement.setObject(parameterIndex++, value);
-                }
+        PreparedStatement preparedStatement = openConnection().prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+        System.out.println(query);
+        int parameterIndex = 1;
+        for (Field field : fields) {
+            field.setAccessible(true);
+            Object value = field.get(entity);
+            if (value != null && !"0".equals(value.toString())) {
+                preparedStatement.setObject(parameterIndex++, value);
             }
-            int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected > 0) {
-                ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    return generatedKeys.getInt(1);
-                } else {
-                    throw new SQLException("Tạo bản ghi thất bại, không có ID nào được lấy ra.");
-                }
+        }
+        int rowsAffected = preparedStatement.executeUpdate();
+        if (rowsAffected > 0) {
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                int generatedKey = generatedKeys.getInt(1);
+                return generatedKey;
             } else {
-                throw new SQLException("Tạo bản ghi thất bại, không có hàng nào bị ảnh hưởng.");
+                throw new SQLException("Creating record failed, no ID obtained.");
             }
+        } else {
+            throw new SQLException("Creating record failed, no rows affected.");
         }
     }
 
     @Override
     public void insertAll(List entity) throws SQLException, IllegalAccessException {
         List<Entity> entityList = entity;
-        try (Connection connection = openConnection()) {
+        PreparedStatement pstm = null;
+
+        try {
             for (Entity entity1 : entityList) {
-                String query = queryInsert(entity1).toString();
-                try (PreparedStatement pstm = openPstm(query, connection)) {
-                    System.out.println(query);
-                    Field[] fields = entity1.getClass().getDeclaredFields();
-                    int parameterIndex = 1;
-                    for (Field field : fields) {
-                        field.setAccessible(true);
-                        Object value = field.get(entity1);
-                        if (value != null && !"0".equals(value.toString())) {
-                            pstm.setObject(parameterIndex++, value);
-                        }
+                String query = queryInsert(entity1).toString(); // Tạo query insert riêng cho từng phần tử
+                pstm = openPstm(query);
+                System.out.println(query);
+                Field[] fields = entity1.getClass().getDeclaredFields();
+                int parameterIndex = 1;
+                for (Field field : fields) {
+                    field.setAccessible(true);
+                    Object value = field.get(entity1);
+                    if (value != null && !"0".equals(value.toString())) {
+                        pstm.setObject(parameterIndex++, value);
                     }
-                    pstm.executeUpdate();
                 }
+
+                pstm.executeUpdate(); // Thực hiện insert cho từng phần tử
+            }
+        } finally {
+            if (pstm != null) {
+                pstm.close();
             }
         }
     }
@@ -447,68 +474,65 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         Field[] fields = entity.getClass().getDeclaredFields();
         String query = queryUpdate(entity).toString();
         System.out.println(query);
-        try (Connection connection = openConnection();
-             PreparedStatement pstm = openPstm(query, connection)) {
-            int parameterIndex = 1;
-            for (int i = 1; i < fields.length; i++) {
-                fields[i].setAccessible(true);
-                Object value = fields[i].get(entity);
-                if (value != null && !"0".equals(value.toString())) {
-                    pstm.setObject(parameterIndex++, value);
-                }
-            }
-            fields[0].setAccessible(true);
-            Object value1 = fields[0].get(entity);
-            pstm.setObject(parameterIndex, value1);
+        pstm = openPstm(query);
 
-            boolean rowsUpdated = exUpdate(pstm);
-            System.out.println(rowsUpdated);
-            return rowsUpdated;
+        int parameterIndex = 1;
+        for (int i = 1; i < fields.length; i++) {
+            fields[i].setAccessible(true);
+            Object value = fields[i].get(entity);
+            if (value != null && !"0".equals(value.toString())) {
+                pstm.setObject(parameterIndex++, value);
+            }
         }
+
+        fields[0].setAccessible(true);
+        Object value1 = fields[0].get(entity);
+        pstm.setObject(parameterIndex, value1);
+
+        boolean rowsUpdated = exUpdate();
+        System.out.println(rowsUpdated);
+        return rowsUpdated;
     }
 
     @Override
     public boolean delete(Entity entity) throws IllegalAccessException, SQLException {
         String query = queryDelete(entity).toString();
         System.out.println(query);
-        try (Connection connection = openConnection();
-             PreparedStatement pstm = openPstm(query, connection)) {
-            Field[] fields = entity.getClass().getDeclaredFields();
-            List<Field> validFields = new ArrayList<>();
-            for (Field f : fields) {
-                f.setAccessible(true);
-                Object val = f.get(entity);
-                if (val != null && !"0".equals(val.toString())) {
-                    validFields.add(f);
-                }
+        pstm = openPstm(query);
+        Field[] fields = entity.getClass().getDeclaredFields();
+        List<Field> validFields = new ArrayList<>();
+        for (Field f : fields) {
+            f.setAccessible(true);
+            Object val = f.get(entity);
+            if (val != null && !"0".equals(val.toString())) {
+                validFields.add(f);
             }
-            int index = 1;
-            for (Field f : validFields) {
-                Object val = f.get(entity);
-                pstm.setObject(index, val);
-                index++;
-            }
-            boolean rowsUpdated = exUpdate(pstm);
-            System.out.println(rowsUpdated);
-            return rowsUpdated;
         }
+        int index = 1;
+        for (Field f : validFields) {
+            Object val = f.get(entity);
+            pstm.setObject(index, val);
+            index++;
+        }
+        boolean rowsUpdated = exUpdate();
+        System.out.println(rowsUpdated);
+        return rowsUpdated;
     }
 
     @Override
     public List<T> getAll(Class entityClass) throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         List<T> entities = new ArrayList<>();
         String query = queryGetAll(entityClass).toString();
+        pstm = openPstm(query);
         System.out.println(query);
-        try (Connection connection = openConnection();
-             PreparedStatement pstm = openPstm(query, connection);
-             ResultSet rs = exQuery(pstm)) {
-            while (rs.next()) {
-                T newEntity = (T) createEntityFromResultSet(rs, entityClass);
-                entities.add(newEntity);
-            }
+        ResultSet rs = exQuery();
+        while (rs.next()) {
+            T newEntity = (T) createEntityFromResultSet(rs, entityClass);
+            entities.add(newEntity);
         }
         return entities;
     }
+
 
     private T createEntityFromResultSet(ResultSet rs, Class<T> entityClass) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         T newEntity = entityClass.getDeclaredConstructor().newInstance();
@@ -520,11 +544,14 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
             try {
                 field = entityClass.getDeclaredField(columnName);
             } catch (NoSuchFieldException e) {
+                // Field không tồn tại trong lớp entityClass, bỏ qua
                 continue;
             }
+
             field.setAccessible(true);
             Object value = rs.getObject(columnName);
             if (value != null) {
+                // Kiểm tra nếu trường là LocalDateTime và giá trị là Timestamp
                 if (field.getType().equals(LocalDateTime.class) && value instanceof Timestamp) {
                     field.set(newEntity, ((Timestamp) value).toLocalDateTime());
                 } else {
@@ -535,15 +562,21 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         return newEntity;
     }
 
+
+
+
     @Override
     public List<T> getEntityById(Entity entity) throws SQLException, IllegalAccessException, InstantiationException {
-        List<T> entityList = new ArrayList<>();
+        List<T> entityList = new ArrayList<>(); // Khai báo và khởi tạo entityList
+
         String query = queryGetEntityById(entity).toString();
         System.out.println("SQL Query: " + query);
-        try (Connection connection = openConnection();
-             PreparedStatement pstm = openPstm(query, connection)) {
+
+        // Đảm bảo rằng PreparedStatement và ResultSet được quản lý tốt
+        try (PreparedStatement pstm = openPstm(query)) {
             Field[] fields = entity.getClass().getDeclaredFields();
             List<Field> validFields = new ArrayList<>();
+
             for (Field f : fields) {
                 f.setAccessible(true);
                 Object val = f.get(entity);
@@ -551,21 +584,26 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
                     validFields.add(f);
                 }
             }
+
             int index = 1;
             for (Field f : validFields) {
                 Object val = f.get(entity);
                 pstm.setObject(index, val);
                 index++;
             }
+
             try (ResultSet rs = pstm.executeQuery()) {
                 if (rs == null) {
                     throw new SQLException("ResultSet is null");
                 }
+
                 ResultSetMetaData metaData = rs.getMetaData();
                 if (metaData == null) {
                     throw new SQLException("ResultSetMetaData is null");
                 }
+
                 System.out.println("Column Count: " + metaData.getColumnCount());
+
                 while (rs.next()) {
                     T newEntity = (T) entity.getClass().newInstance();
                     for (int i = 1; i <= metaData.getColumnCount(); i++) {
@@ -574,7 +612,9 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
                             field.setAccessible(true);
                             if (field.getName().equals(columnName)) {
                                 Object fieldValue = rs.getObject(i);
+                                // Kiểm tra nếu fieldValue là null và kiểu dữ liệu của field là nguyên thủy (như int)
                                 if (fieldValue == null && field.getType().isPrimitive()) {
+                                    // Nếu fieldValue là null và field là nguyên thủy, bỏ qua việc thiết lập giá trị
                                     continue;
                                 }
                                 field.set(newEntity, fieldValue);
@@ -587,114 +627,152 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
                 }
             }
         }
+
         return entityList;
     }
+
+
+
+
+
+
 
     public T getManyToOne(Entity entity) throws SQLException, IllegalAccessException, InstantiationException {
         String query = queryGetEntityById(entity).toString();
         System.out.println(query);
-        try (Connection connection = openConnection();
-             PreparedStatement pstm = openPstm(query, connection)) {
-            Field[] fields = entity.getClass().getDeclaredFields();
-            List<Field> validFields = new ArrayList<>();
-            for (Field f : fields) {
-                f.setAccessible(true);
-                Object val = f.get(entity);
-                if (val != null && !"0".equals(val.toString())) {
-                    validFields.add(f);
-                }
-            }
-            int index = 1;
-            for (Field f : validFields) {
-                Object val = f.get(entity);
-                pstm.setObject(index, val);
-                index++;
-            }
-            try (ResultSet rs = exQuery(pstm)) {
-                T newEntity = null;
-                if (rs.next()) {
-                    newEntity = (T) entity.getClass().newInstance();
-                    for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                        String columnName = rs.getMetaData().getColumnName(i);
-                        for (Field field : fields) {
-                            field.setAccessible(true);
-                            if (field.getName().equals(columnName)) {
-                                Object fieldValue = rs.getObject(i);
-                                field.set(newEntity, fieldValue);
-                                System.out.println(field.getName() + ": " + fieldValue);
-                                break;
-                            }
-                        }
-                    }
-                }
-                return newEntity;
+        openPstm(query);
+
+        Field[] fields = entity.getClass().getDeclaredFields();
+        List<Field> validFields = new ArrayList<>();
+
+        for (Field f : fields) {
+            f.setAccessible(true);
+            Object val = f.get(entity);
+            if (val != null && !"0".equals(val.toString())) {
+                validFields.add(f);
             }
         }
+
+        int index = 1;
+        for (Field f : validFields) {
+            Object val = f.get(entity);
+            pstm.setObject(index, val);
+            index++;
+        }
+        ResultSet rs = exQuery();
+
+        T newEntity = null;
+        if (rs.next()) {
+            newEntity = (T) entity.getClass().newInstance();
+            for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                String columnName = rs.getMetaData().getColumnName(i);
+                for (Field field : fields) {
+                    field.setAccessible(true);
+                    if (field.getName().equals(columnName)) {
+                        Object fieldValue = rs.getObject(i);
+                        field.set(newEntity, fieldValue);
+                        System.out.println(field.getName() + ": " + fieldValue);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return newEntity;
     }
 
     public List<Entity> getEntityListById(List<Entity> listObject) throws SQLException {
         List<Entity> entityList = new ArrayList<>();
-        try (Connection connection = openConnection()) {
+        Connection conn = null;
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+
+        try {
+            conn = openConnection(); // Lấy kết nối tới cơ sở dữ liệu
+
             for (Entity entity : listObject) {
                 String query = queryGetEntityById(entity).toString();
                 System.out.println(query);
-                try (PreparedStatement pstm = openPstm(query, connection)) {
-                    Field[] fields = entity.getClass().getDeclaredFields();
-                    List<Field> validFields = new ArrayList<>();
-                    for (Field f : fields) {
-                        f.setAccessible(true);
-                        Object val = f.get(entity);
-                        if (val != null && !"0".equals(val.toString())) {
-                            validFields.add(f);
-                        }
-                    }
-                    int index = 1;
-                    for (Field f : validFields) {
-                        Object val = f.get(entity);
-                        pstm.setObject(index, val);
-                        index++;
-                    }
-                    try (ResultSet rs = pstm.executeQuery()) {
-                        List<Entity> tempEntityList = new ArrayList<>();
-                        while (rs.next()) {
-                            Entity newEntity = entity.getClass().getDeclaredConstructor().newInstance();
-                            for (Field field : fields) {
-                                field.setAccessible(true);
-                                String columnName = field.getName();
-                                Object fieldValue = rs.getObject(columnName);
-                                if (fieldValue != null && !"0".equals(fieldValue.toString())) {
-                                    field.set(newEntity, fieldValue);
-                                    System.out.println(columnName + ": " + fieldValue);
-                                }
-                            }
-                            tempEntityList.add(newEntity);
-                        }
-                        entityList.addAll(tempEntityList);
+                pstm = conn.prepareStatement(query);
+
+                Field[] fields = entity.getClass().getDeclaredFields();
+                List<Field> validFields = new ArrayList<>();
+
+                for (Field f : fields) {
+                    f.setAccessible(true);
+                    Object val = f.get(entity);
+                    if (val != null && !"0".equals(val.toString())) {
+                        validFields.add(f);
                     }
                 }
+
+                int index = 1;
+                for (Field f : validFields) {
+                    Object val = f.get(entity);
+                    pstm.setObject(index, val);
+                    index++;
+                }
+
+                rs = pstm.executeQuery();
+
+                List<Entity> tempEntityList = new ArrayList<>(); // Tạo một list tạm để lưu trữ entity mới
+
+                while (rs.next()) {
+                    Entity newEntity = entity.getClass().getDeclaredConstructor().newInstance();
+                    for (Field field : fields) {
+                        field.setAccessible(true);
+                        String columnName = field.getName();
+                        Object fieldValue = rs.getObject(columnName);
+
+                        if (fieldValue != null && !"0".equals(fieldValue.toString())) {
+                            field.set(newEntity, fieldValue);
+                            System.out.println(columnName + ": " + fieldValue);
+                        }
+                    }
+                    tempEntityList.add(newEntity);
+                }
+
+                entityList.addAll(tempEntityList); // Thêm tất cả entity mới vào entityList sau khi xử lý ResultSet
             }
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
+            // Xử lý ngoại lệ khi tạo mới Entity không thành công
             e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (pstm != null) {
+                pstm.close();
+            }
+            if (conn != null) {
+                conn.close(); // Đóng kết nối
+            }
         }
+
         return entityList;
     }
 
     public void insertAll1(List<Entity> objectList) throws SQLException, IllegalAccessException {
-        try (Connection connection = openConnection()) {
-            for (Entity entity : objectList) {
-                String query = queryInsert(entity).toString();
-                try (PreparedStatement pstm = openPstm(query, connection)) {
-                    System.out.println(query);
-                    Field[] fields = entity.getClass().getDeclaredFields();
-                    int parameterIndex = 1;
-                    for (Field field : fields) {
-                        field.setAccessible(true);
-                        Object value = field.get(entity);
-                        if (value != null && !"0".equals(value.toString())) {
-                            pstm.setObject(parameterIndex++, value);
-                        }
+        for (Entity entity : objectList) {
+            PreparedStatement pstm = null;
+            try {
+                String query = queryInsert(entity).toString(); // Tạo query insert riêng cho từng phần tử
+                pstm = openPstm(query);
+                System.out.println(query);
+                Field[] fields = entity.getClass().getDeclaredFields();
+                int parameterIndex = 1;
+                for (Field field : fields) {
+                    field.setAccessible(true);
+                    Object value = field.get(entity);
+                    if (value != null && !"0".equals(value.toString())) {
+                        pstm.setObject(parameterIndex++, value);
                     }
-                    pstm.executeUpdate();
+                }
+                pstm.executeUpdate(); // Thực hiện insert cho từng phần tử
+            } finally {
+                if (pstm != null) {
+                    pstm.close();
                 }
             }
         }
@@ -703,9 +781,12 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
     public void forgotPassword(String patientEmail, String patientCode) throws SQLException {
         StringBuilder query = queryforgot(patientEmail, patientCode);
         try (Connection connection = openConnection();
-             PreparedStatement preparedStatement = openPstm(query.toString(), connection)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query.toString())) {
+
+            // Đặt các giá trị tham số cho câu lệnh SQL
             preparedStatement.setString(1, patientCode);
             preparedStatement.setString(2, patientEmail);
+
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected == 0) {
                 throw new SQLException("Updating record failed, no rows affected.");
@@ -714,14 +795,21 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
     }
 
     private StringBuilder queryforgot(String patientEmail, String patientCode) {
-        String tableName = "patients";
+        String tableName = "patients"; // Tên bảng trong cơ sở dữ liệu
         StringBuilder query = new StringBuilder("UPDATE ");
         query.append(tableName).append(" SET ");
+
+        // Thêm patient_code vào phần set
         query.append("patient_code = ?");
+
+        // Thêm điều kiện where với patient_email
         query.append(" WHERE patient_email = ?");
+
+        // In ra câu lệnh SQL để kiểm tra
         System.out.println("SQL Query: " + query.toString());
         System.out.println("patient_code: " + patientCode);
         System.out.println("patient_email: " + patientEmail);
+
         return query;
     }
 
@@ -729,10 +817,12 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         String query = "UPDATE patients SET patient_password = ?, patient_code = NULL WHERE patient_email = ? AND patient_code = ?";
         System.out.println(query);
         try (Connection connection = openConnection();
-             PreparedStatement preparedStatement = openPstm(query, connection)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
             preparedStatement.setString(1, newPassword);
             preparedStatement.setString(2, patientEmail);
             preparedStatement.setString(3, patientCode);
+
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected == 0) {
                 throw new SQLException("Updating password failed, no rows affected.");
@@ -743,7 +833,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
     public void saveFeedback(Feedback feedback) throws SQLException {
         String sql = "INSERT INTO feedback (name, phone, email, subject, message, created_at) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connection = openConnection();
-             PreparedStatement stmt = openPstm(sql, connection)) {
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, feedback.getName());
             stmt.setString(2, feedback.getPhone());
             stmt.setString(3, feedback.getEmail());
@@ -754,3 +844,4 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         }
     }
 }
+
