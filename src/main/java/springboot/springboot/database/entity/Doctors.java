@@ -16,6 +16,7 @@ public class Doctors extends Entity<Integer> {
     private String doctor_image;
     private BigDecimal doctor_price;
     private String doctor_description;
+    private String working_status;
     private List<Departments> department;
     private List<Appointments> appointmentsList;
     private List<Medicalrecords> medicalrecordsList;
@@ -32,6 +33,14 @@ public class Doctors extends Entity<Integer> {
 
     public void setDoctor_description(String doctor_description) {
         this.doctor_description = doctor_description;
+    }
+
+    public String getWorking_status() {
+        return working_status;
+    }
+
+    public void setWorking_status(String working_status) {
+        this.working_status = working_status;
     }
 
     public BigDecimal getDoctor_price() {
