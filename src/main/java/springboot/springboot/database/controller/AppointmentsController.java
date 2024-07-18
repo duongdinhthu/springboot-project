@@ -89,9 +89,44 @@ public class AppointmentsController<T extends Entity<?>> {
     }
 
     @GetMapping("/list")
-    public List<T> list() throws SQLException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
-        return model.getAll(new Appointments().getClass());
+    public List<Appointments> list() {
+        try {
+            List<Appointments> appointmentsList = new ArrayList<>();
+            List<Appointments> appointments = model.getAll(new Appointments().getClass());
+
+            for (Appointments appointment : appointments) {
+                Appointments newAppointment = new Appointments();
+                BeanUtils.copyProperties(appointment, newAppointment);
+
+                if (appointment.getStaff_id() != null) {
+                    Staffs staffsFilter = new Staffs();
+                    staffsFilter.setStaff_id(appointment.getStaff_id());
+                    newAppointment.setStaff(model.getEntityById(staffsFilter));
+                }
+
+                if (appointment.getDoctor_id() != null) {
+                    Doctors doctorsFilter = new Doctors();
+                    doctorsFilter.setDoctor_id(appointment.getDoctor_id());
+                    newAppointment.setDoctor(model.getEntityById(doctorsFilter));
+                }
+
+                if (appointment.getPatient_id() != null) {
+                    Patients patientsFilter = new Patients();
+                    patientsFilter.setPatient_id(appointment.getPatient_id());
+                    newAppointment.setPatient(model.getEntityById(patientsFilter));
+                }
+
+                appointmentsList.add(newAppointment);
+            }
+
+            return appointmentsList;
+        } catch (Exception e) {
+            // Log the exception and return an appropriate error response
+            e.printStackTrace();
+            return new ArrayList<>(); // or return a custom error response
+        }
     }
+
 
     @GetMapping("/search")
     public List<Appointments> getByField(@RequestParam Map<String, String> requestParams) {

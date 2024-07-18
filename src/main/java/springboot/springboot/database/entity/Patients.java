@@ -16,6 +16,7 @@ public class Patients extends Entity<Integer> {
     private List<Medicalrecords> medicalrecordsList;
     private String patient_gender;
     private String patient_code;
+    private String patient_img; // Thay đổi kiểu dữ liệu thành String để lưu trữ đường dẫn ảnh
 
     public Patients() {
     }
@@ -116,6 +117,14 @@ public class Patients extends Entity<Integer> {
         this.patient_code = patient_code;
     }
 
+    public String getPatient_img() {
+        return patient_img;
+    }
+
+    public void setPatient_img(String patient_img) {
+        this.patient_img = patient_img;
+    }
+
     @Override
     public String toString() {
         return "Patients{" +
@@ -131,6 +140,7 @@ public class Patients extends Entity<Integer> {
                 ", medicalrecordsList=" + medicalrecordsList +
                 ", patient_gender='" + patient_gender + '\'' +
                 ", patient_code='" + patient_code + '\'' +
+                ", patient_img='" + patient_img + '\'' +
                 '}';
     }
 }
