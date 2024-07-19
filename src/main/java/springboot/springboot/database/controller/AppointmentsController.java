@@ -6,18 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springboot.springboot.database.entity.*;
-import springboot.springboot.database.model.EntityToJSON;
+import springboot.springboot.database.model.AppointmentLockManager;
 import springboot.springboot.database.model.ModelBuid;
 import springboot.springboot.database.model.SendEmailUsername;
-
-import java.lang.reflect.Constructor;
+import springboot.springboot.database.model.EntityToJSON;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -29,6 +24,9 @@ public class AppointmentsController<T extends Entity<?>> {
 
     @Autowired
     private ModelBuid model;
+
+    @Autowired
+    private AppointmentLockManager appointmentLockManager;
 
     @GetMapping("/")
     public String showForm() {
@@ -121,12 +119,10 @@ public class AppointmentsController<T extends Entity<?>> {
 
             return appointmentsList;
         } catch (Exception e) {
-            // Log the exception and return an appropriate error response
             e.printStackTrace();
-            return new ArrayList<>(); // or return a custom error response
+            return new ArrayList<>();
         }
     }
-
 
     @GetMapping("/search")
     public List<Appointments> getByField(@RequestParam Map<String, String> requestParams) {
@@ -165,12 +161,10 @@ public class AppointmentsController<T extends Entity<?>> {
 
             return appointmentsList;
         } catch (Exception e) {
-            // Log the exception and return an appropriate error response
             e.printStackTrace();
-            return new ArrayList<>(); // or return a custom error response
+            return new ArrayList<>();
         }
     }
-
 
     @GetMapping("/{doctorId}/slots")
     public List<Appointments> getAppointmentsByDoctorId(@PathVariable("doctorId") int doctorId) throws SQLException, IllegalAccessException, InstantiationException {
@@ -201,10 +195,6 @@ public class AppointmentsController<T extends Entity<?>> {
         model.insertAll(appointmentsList);
     }
 
-    public static Object createElementInstance(Class<?> elementType) throws Exception {
-        Constructor<?> constructor = elementType.getConstructor();
-        return constructor.newInstance();
-    }
     @PutMapping("/updateStatus")
     public ResponseEntity<?> updateStatus(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
         ModelMapper modelMapper = new ModelMapper();
@@ -226,6 +216,7 @@ public class AppointmentsController<T extends Entity<?>> {
         model.update(appointments);
         return ResponseEntity.ok("Appointment status updated successfully");
     }
+
     @GetMapping("/fields")
     public ResponseEntity<List<String>> getAppointmentFields() {
         Field[] fields = Appointments.class.getDeclaredFields();
@@ -234,6 +225,7 @@ public class AppointmentsController<T extends Entity<?>> {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(fieldNames);
     }
+
     @PostMapping("/send-email")
     public ResponseEntity<?> sendEmail(@RequestBody Map<String, String> emailData) {
         try {
@@ -243,15 +235,16 @@ public class AppointmentsController<T extends Entity<?>> {
             String patientEmail = emailData.get("patientEmail");
             String patientName = emailData.get("patientName");
             String timeSlot = emailData.get("timeSlot");
-            System.out.println(doctorName+","+departmentName+","+medicalDay+","+patientEmail+","+patientName+","+timeSlot);
+            System.out.println(doctorName + "," + departmentName + "," + medicalDay + "," + patientEmail + "," + patientName + "," + timeSlot);
             // Gửi email với thông tin đã nhận
-            sendEmail.sendEmailFormRegister(doctorName, departmentName, medicalDay, patientEmail, patientName,timeSlot);
+            sendEmail.sendEmailFormRegister(doctorName, departmentName, medicalDay, patientEmail, patientName, timeSlot);
             return ResponseEntity.ok("Email sent successfully");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Error sending email");
         }
     }
+
     @PostMapping("/send-email-doctor")
     public ResponseEntity<?> sendEmailToDoctor(@RequestBody Map<String, String> emailData) {
         try {
@@ -263,12 +256,12 @@ public class AppointmentsController<T extends Entity<?>> {
             String timeSlot = emailData.get("timeSlot");
 
             // In ra các giá trị nhận được để kiểm tra
-            System.out.println("Doctor Name: " + doctorName);
-            System.out.println("Department Name: " + departmentName);
-            System.out.println("Appointment Date: " + appointmentDate);
-            System.out.println("Doctor Email: " + doctorEmail);
-            System.out.println("Patient Name: " + patientName);
-            System.out.println("Time Slot: " + timeSlot);
+            System.out.println("Doctor Name: "+doctorName);
+            System.out.println("Department Name: "+departmentName);
+            System.out.println("Appointment Date: "+appointmentDate);
+            System.out.println("Doctor Email: "+doctorEmail);
+            System.out.println("Patient Name: "+patientName);
+            System.out.println("Time Slot: "+timeSlot);
 
             sendEmail.sendEmailToDoctor(doctorName, departmentName, appointmentDate, doctorEmail, patientName, timeSlot);
             return ResponseEntity.ok("Email sent to doctor successfully");
@@ -278,5 +271,53 @@ public class AppointmentsController<T extends Entity<?>> {
         }
     }
 
+    // API để khóa slot
+    @PostMapping("/lock-slot")
+    public ResponseEntity<?> lockSlot(@RequestBody Map<String, Object> slotData) {
+        String doctorId = slotData.get("doctorId").toString();
+        String date = slotData.get("date").toString();
+        String time = slotData.get("time").toString();
 
+        // Kiểm tra xem slot đã bị khóa chưa
+        if (appointmentLockManager.isSlotLocked(doctorId, date, time)) {
+            return ResponseEntity.status(409).body("Slot already locked");
+        }
+
+        // Khóa slot
+        appointmentLockManager.lockSlot(doctorId, date, time);
+
+        return ResponseEntity.ok("Slot locked successfully");
+    }
+
+    @PostMapping("/confirm-payment")
+    public ResponseEntity<?> confirmPayment(@RequestBody Map<String, Object> slotData) {
+        String doctorId = slotData.get("doctorId").toString();
+        String date = slotData.get("date").toString();
+        String time = slotData.get("time").toString();
+
+        // Xác nhận thanh toán và hủy bỏ khóa
+        appointmentLockManager.confirmPayment(doctorId, date, time);
+
+        return ResponseEntity.ok("Payment confirmed and slot unlocked");
+    }
+
+
+    @GetMapping("/check-locked-slots")
+    public ResponseEntity<List<Map<String, String>>> checkLockedSlots(
+            @RequestParam("doctorId") String doctorId,
+            @RequestParam("date") String date) {
+        List<Map<String, String>> lockedSlots = new ArrayList<>();
+
+        // Kiểm tra các slot đã bị khóa
+        for (int i = 8; i <= 17; i++) {
+            String time = String.format("%02d:00", i);
+            if (appointmentLockManager.isSlotLocked(doctorId, date, time)) {
+                Map<String, String> lockedSlot = new HashMap<>();
+                lockedSlot.put("time", time);
+                lockedSlots.add(lockedSlot);
+            }
+        }
+
+        return ResponseEntity.ok(lockedSlots);
+    }
 }
