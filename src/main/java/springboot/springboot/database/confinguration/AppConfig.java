@@ -1,16 +1,12 @@
-package springboot.springboot.database.confinguration;
+package springboot.springboot.database.configuration;
 
-import com.corundumstudio.socketio.SocketIOServer;
-import com.corundumstudio.socketio.Configuration;
-import jakarta.annotation.PreDestroy;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.modelmapper.ModelMapper;
 
-@org.springframework.context.annotation.Configuration
+@Configuration
 public class AppConfig implements WebMvcConfigurer {
 
     @Bean
@@ -18,20 +14,13 @@ public class AppConfig implements WebMvcConfigurer {
         return new ModelMapper();
     }
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/v1/**")
-                        .allowedOrigins("http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003", "http://localhost:3004")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
-            }
-        };
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOriginPatterns("*") // Sử dụng allowedOriginPatterns thay vì allowedOrigins
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true)
+                .maxAge(3600);
     }
-
-
-
 }

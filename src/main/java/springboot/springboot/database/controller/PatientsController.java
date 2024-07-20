@@ -308,4 +308,27 @@ public class PatientsController<T extends Entity<?>> {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(Collections.singletonMap("username", newPatient.getPatient_name()));
     }
+    @PostMapping("/change-password")
+    public void changePassword(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException, InstantiationException {
+        ModelMapper modelMapper = new ModelMapper();
+        Patients patients = modelMapper.map(requestData, Patients.class);
+        System.out.println(patients.toString());
+        // Kiểm tra và lấy bệnh nhân từ cơ sở dữ liệu
+        List<Patients> list = model.getEntityById(patients);
+        Patients existingPatient = list.get(0);
+        if (existingPatient == null) {
+            throw new IllegalArgumentException("Patient not found.");
+        }
+
+        // Kiểm tra mật khẩu hiện tại
+        String currentPassword = (String) requestData.get("currentPassword");
+        if (!currentPassword.equals(existingPatient.getPatient_password())) {
+            throw new IllegalArgumentException("Current password is incorrect.");
+        }
+
+        // Cập nhật mật khẩu mới
+        String newPassword = (String) requestData.get("newPassword");
+        existingPatient.setPatient_password(newPassword);
+        model.update(existingPatient);
+    }
 }
