@@ -203,16 +203,17 @@ public class AppointmentsController<T extends Entity<?>> {
         // Lấy thông tin appointment từ requestData
         Appointments appointments = modelMapper.map(requestData, Appointments.class);
 
-        // Chuyển đổi staff_id từ String sang Integer
+        // Kiểm tra và lấy staff_id từ requestData nếu có
         if (requestData.containsKey("staff_id")) {
             try {
-                Integer staffId = Integer.valueOf((String) requestData.get("staff_id"));
+                Integer staffId = Integer.valueOf(requestData.get("staff_id").toString());
                 appointments.setStaff_id(staffId);
             } catch (NumberFormatException e) {
                 return ResponseEntity.badRequest().body("Invalid staff_id format");
             }
         }
 
+        // Cập nhật trạng thái cuộc hẹn
         model.update(appointments);
         return ResponseEntity.ok("Appointment status updated successfully");
     }
