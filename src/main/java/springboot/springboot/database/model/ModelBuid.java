@@ -1,5 +1,4 @@
 package springboot.springboot.database.model;
-
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ConfigurationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +7,6 @@ import org.reflections.Reflections;
 import org.springframework.stereotype.Component;
 import springboot.springboot.database.entity.Entity;
 import springboot.springboot.database.entity.Feedback;
-
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -167,25 +165,6 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         return query;
     }
 
-    public List<Entity> executeQueryGetAll(Entity entity) throws IllegalAccessException {
-        StringBuilder query = queryGetAll(entity);
-        Object[] params = extractParams(entity);
-
-        return jdbcTemplate.query(query.toString(), params, (rs, rowNum) -> {
-            try {
-                Entity resultEntity = entity.getClass().newInstance();
-                Field[] fields = entity.getClass().getDeclaredFields();
-                for (Field field : fields) {
-                    field.setAccessible(true);
-                    field.set(resultEntity, rs.getObject(field.getName()));
-                }
-                return resultEntity;
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new SQLException("Error mapping row to entity", e);
-            }
-        });
-    }
-
     private Object[] extractParams(Entity entity) throws IllegalAccessException {
         List<Object> params = new ArrayList<>();
         Field[] fields = entity.getClass().getDeclaredFields();
@@ -324,35 +303,6 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         }
 
         return null; // No common field found for join
-    }
-
-
-    public List<Entity> executeQuery(String query, Entity entity) throws SQLException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-        List<Entity> entities = new ArrayList<>();
-        jdbcTemplate.query(query, rs -> {
-            Entity resultEntity = null;
-            try {
-                resultEntity = entity.getClass().getDeclaredConstructor().newInstance();
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-            for (Field field : entity.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                try {
-                    field.set(resultEntity, rs.getObject(field.getName()));
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            entities.add(resultEntity);
-        });
-        return entities;
     }
 
     private StringBuilder queryGetEntityById(Entity entity) {
@@ -588,48 +538,6 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
             }
         }
         return entityList;
-    }
-
-    public T getManyToOne(Entity entity) throws SQLException, IllegalAccessException, InstantiationException {
-        String query = queryGetEntityById(entity).toString();
-        System.out.println(query);
-        try (Connection connection = openConnection();
-             PreparedStatement pstm = openPstm(query, connection)) {
-            Field[] fields = entity.getClass().getDeclaredFields();
-            List<Field> validFields = new ArrayList<>();
-            for (Field f : fields) {
-                f.setAccessible(true);
-                Object val = f.get(entity);
-                if (val != null && !"0".equals(val.toString())) {
-                    validFields.add(f);
-                }
-            }
-            int index = 1;
-            for (Field f : validFields) {
-                Object val = f.get(entity);
-                pstm.setObject(index, val);
-                index++;
-            }
-            try (ResultSet rs = exQuery(pstm)) {
-                T newEntity = null;
-                if (rs.next()) {
-                    newEntity = (T) entity.getClass().newInstance();
-                    for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                        String columnName = rs.getMetaData().getColumnName(i);
-                        for (Field field : fields) {
-                            field.setAccessible(true);
-                            if (field.getName().equals(columnName)) {
-                                Object fieldValue = rs.getObject(i);
-                                field.set(newEntity, fieldValue);
-                                System.out.println(field.getName() + ": " + fieldValue);
-                                break;
-                            }
-                        }
-                    }
-                }
-                return newEntity;
-            }
-        }
     }
 
     public List<Entity> getEntityListById(List<Entity> listObject) throws SQLException {
