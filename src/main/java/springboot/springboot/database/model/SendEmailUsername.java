@@ -69,10 +69,32 @@ public class SendEmailUsername {
     public void sendEmailFormRegister(String doctorName, String departmentName, String medicalDay, String patientEmail, String patientName,String timeSlot) {
         final String username = "thuddth2307004@fpt.edu.vn";
         final String password = "kyxm zvbz nvsn uxxx";
-        String subject = "Chúc mừng bạn đã đăng kí khám thành công tại FPT Health ";
-        String body = "Xin chào " + patientName + " , bạn đã đặt khám thành công tại FPT Health , Khoa khám bệnh của bạn là: " + departmentName +
-                "Bác sĩ khám cho bạn là: " + doctorName + "Ngày khám của bạn là:" + medicalDay
-                +"Giờ khám của bạn là:"+timeSlot +" Nhân viên của chúng tôi sẽ liên hệ với bạn để huướng dẫn bạn chi tiết . Trân trọng !";
+        String subject = "Appointment Notification";
+        String body = "<html>" +
+                "<head>" +
+                "<style>" +
+                "body { font-family: Arial, sans-serif;margin: 0;padding: 0; }" +
+                ".container { max-width: 600px; height: fit-content; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
+                ".header { background-color: #436FEC; color: white; padding: 10px; text-align: center; border-radius: 8px 8px 0 0; }" +
+                ".content { padding: 20px; }" +
+                "</style>" +
+                "</head>" +
+                "<body>" +
+                "<div class='container'>" +
+                "<div class='header'>" +
+                "<h2>Appointment Notification</h2>" +
+                "</div>" +
+                "<div class='content'>" +
+                "<p>Hi <strong>" + patientName + "</strong>,</p>" +
+                "<p>You have successfully booked an appointment at FPT Health.</p>" +
+                "<p><strong>Your department:</strong> " + departmentName + "</p>" +
+                "<p><strong>Your doctor:</strong> " + doctorName + "</p>" +
+                "<p><strong>Your appointment date:</strong> " + medicalDay + "&nbsp" + timeSlot + "</p>" +
+                "<p>Our staff will contact you to give you detailed instructions. Best regards!</p>" +
+                "</div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -91,7 +113,7 @@ public class SendEmailUsername {
             message.setRecipients(Message.RecipientType.TO,
                     InternetAddress.parse(patientEmail));
             message.setSubject(subject);
-            message.setText(body);
+            message.setContent(body, "text/html; charset=utf-8");
             Transport.send(message);
 
             System.out.println("Email sent successfully");
@@ -161,6 +183,28 @@ public class SendEmailUsername {
         final String username = "thuddth2307004@fpt.edu.vn";
         final String password = "kyxm zvbz nvsn uxxx";
         String subject = "Reply from Admin";
+        String body = "<html>" +
+                "<head>" +
+                "<style>" +
+                "body { font-family: Arial, sans-serif;margin: 0;padding: 0; }" +
+                ".container { max-width: 600px; height: fit-content; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
+                ".header { background-color: #436FEC; color: white; padding: 10px; text-align: center; border-radius: 8px 8px 0 0; }" +
+                ".content { padding: 20px; }" +
+                "</style>" +
+                "</head>" +
+                "<body>" +
+                "<div class='container'>" +
+                "<div class='header'>" +
+                "<h2>Password Reset Request</h2>" +
+                "</div>" +
+                "<div class='content'>" +
+                "<p>Hi <strong>" + name + "</strong>,</p>" +
+                "<p>" + message + "</p>" +
+                "<p>Best Regards!</p>" +
+                "</div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -178,7 +222,7 @@ public class SendEmailUsername {
             msg.setFrom(new InternetAddress(username));
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
             msg.setSubject(subject);
-            msg.setText(message);
+            msg.setContent(body, "text/html; charset=utf-8");
             Transport.send(msg);
             System.out.println("Email sent successfully");
         } catch (MessagingException e) {
@@ -188,11 +232,32 @@ public class SendEmailUsername {
     public void sendEmailToDoctor(String doctorName, String departmentName, String appointmentDate, String doctorEmail, String patientName, String timeSlot) {
         final String username = "thuddth2307004@fpt.edu.vn";
         final String password = "kyxm zvbz nvsn uxxx";
-        String subject = "Thông báo lịch khám mới từ FPT Health";
-        String body = "Xin chào bác sĩ " + doctorName + ", bạn có một lịch khám mới tại FPT Health. Khoa khám bệnh: " + departmentName +
-                ", bệnh nhân: " + patientName + ", ngày khám: " + appointmentDate +
-                ", giờ khám: " + timeSlot +
-                ". Vui lòng kiểm tra và chuẩn bị. Trân trọng!";
+        String subject = "Appointment Notification";
+        String body = "<html>" +
+                "<head>" +
+                "<style>" +
+                "body { font-family: Arial, sans-serif;margin: 0;padding: 0; }" +
+                ".container { max-width: 600px; height: fit-content; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
+                ".header { background-color: #436FEC; color: white; padding: 10px; text-align: center; border-radius: 8px 8px 0 0; }" +
+                ".content { padding: 20px; }" +
+                "</style>" +
+                "</head>" +
+                "<body>" +
+                "<div class='container'>" +
+                "<div class='header'>" +
+                "<h2>Appointment Notification</h2>" +
+                "</div>" +
+                "<div class='content'>" +
+                "<p>Hi <strong>" + doctorName + "</strong>,</p>" +
+                "<p>You have a new appointment at FPT Health.</p>" +
+                "<p><strong>Department:</strong> " + departmentName + "</p>" +
+                "<p><strong>Patient:</strong> " + patientName + "</p>" +
+                "<p><strong>Your appointment date:</strong> " + appointmentDate + "&nbsp" + timeSlot + "</p>" +
+                "<p>Please check and prepare. Best regards!</p>" +
+                "</div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -211,7 +276,7 @@ public class SendEmailUsername {
             message.setRecipients(Message.RecipientType.TO,
                     InternetAddress.parse(doctorEmail));
             message.setSubject(subject);
-            message.setText(body);
+            message.setContent(body, "text/html; charset=utf-8");
             Transport.send(message);
 
             System.out.println("Email sent to doctor successfully");
