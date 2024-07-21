@@ -1,5 +1,6 @@
 package springboot.springboot.database.controller;
 
+import org.springframework.web.multipart.MultipartFile;
 import springboot.springboot.database.entity.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
@@ -11,6 +12,8 @@ import org.springframework.web.client.RestTemplate;
 import springboot.springboot.database.model.EntityToJSON;
 import springboot.springboot.database.model.ModelBuid;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
@@ -39,16 +42,28 @@ public class PatientsController<T extends Entity<?>> {
 
     @PutMapping("/update")
     public void update(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
+        System.out.println("call appi");
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
         Patients patients = modelMapper.map(requestData, Patients.class);
+
+        // Đảm bảo rằng đường dẫn ảnh được bao gồm trong requestData
+        if (requestData.containsKey("patient_img")) {
+            patients.setPatient_img((String) requestData.get("patient_img"));
+        }
+
+        // Set các danh sách khác về null để tránh lỗi ánh xạ không cần thiết
         patients.setAppointmentsList(null);
         patients.setMedicalrecordsList(null);
+
+        // Cập nhật bệnh nhân
         model.update(patients);
     }
 
+
     @DeleteMapping("/delete")
     public String delete(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
+        System.out.println("call success");
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
         Patients patients = modelMapper.map(requestData, Patients.class);
@@ -330,5 +345,49 @@ public class PatientsController<T extends Entity<?>> {
         String newPassword = (String) requestData.get("newPassword");
         existingPatient.setPatient_password(newPassword);
         model.update(existingPatient);
+    }
+
+    @PostMapping("/upload-image")
+    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("image") MultipartFile image, @RequestParam("patient_id") Integer patientId) {
+        String imagePath = ""; // Tùy chỉnh logic lưu trữ và đường dẫn ảnh
+
+        try {
+            // Lưu trữ ảnh và cập nhật đường dẫn ảnh vào cơ sở dữ liệu
+            imagePath = saveImage(image);
+            updatePatientImage(patientId, imagePath);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("filePath", imagePath);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    private String saveImage(MultipartFile image) throws IOException {
+        // Lưu ảnh vào thư mục uploads và trả về đường dẫn ảnh
+        String uploadsDir = "uploads/";
+        String realPathtoUploads = new File(uploadsDir).getAbsolutePath();
+        if (!new File(realPathtoUploads).exists()) {
+            new File(realPathtoUploads).mkdir();
+        }
+
+        String orgName = image.getOriginalFilename();
+        String filePath = realPathtoUploads + File.separator + orgName;
+        File dest = new File(filePath);
+        image.transferTo(dest);
+        return uploadsDir + orgName;
+    }
+
+    private void updatePatientImage(Integer patientId, String imagePath) throws SQLException, IllegalAccessException, InstantiationException {
+        Patients patient = new Patients();
+        patient.setPatient_id(patientId);
+        List<Patients> patientsList = model.getEntityById(patient);
+        if (!patientsList.isEmpty()) {
+            patient = patientsList.get(0);
+            patient.setPatient_img(imagePath);
+            System.out.println("Updating patient with ID: " + patientId + " with image path: " + imagePath);
+            model.update(patient);
+        }
     }
 }
