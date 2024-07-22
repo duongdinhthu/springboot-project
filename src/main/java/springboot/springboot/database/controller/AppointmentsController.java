@@ -12,6 +12,8 @@ import springboot.springboot.database.model.SendEmailUsername;
 import springboot.springboot.database.model.EntityToJSON;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -281,12 +283,13 @@ public class AppointmentsController<T extends Entity<?>> {
 
         // Kiểm tra xem slot đã bị khóa chưa
         if (appointmentLockManager.isSlotLocked(doctorId, date, time)) {
+            System.out.println("slot dang bi khoa");
             return ResponseEntity.status(409).body("Slot already locked");
         }
 
         // Khóa slot
         appointmentLockManager.lockSlot(doctorId, date, time);
-
+        System.out.println("khoa slot");
         return ResponseEntity.ok("Slot locked successfully");
     }
 
@@ -321,4 +324,31 @@ public class AppointmentsController<T extends Entity<?>> {
 
         return ResponseEntity.ok(lockedSlots);
     }
+    @GetMapping("/today")
+    public ResponseEntity<List<Appointments>> getTodaysAppointments(@RequestParam int doctor_id) {
+        LocalDate today = LocalDate.now();
+        List<Appointments> appointmentsList = new ArrayList<>();
+
+        try {
+            Appointments example = new Appointments();
+            example.setDoctor_id(doctor_id);
+            List<Appointments> appointments = model.getEntityById(example);
+
+            for (Appointments appointment : appointments) {
+                LocalDate appointmentDate = appointment.getMedical_day().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                if (appointmentDate.isEqual(today)) {
+                    Appointments newAppointment = new Appointments();
+                    BeanUtils.copyProperties(appointment, newAppointment);
+                    appointmentsList.add(newAppointment);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(appointmentsList);
+        }
+
+        return ResponseEntity.ok(appointmentsList);
+    }
+
 }
