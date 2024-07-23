@@ -120,5 +120,30 @@ public class MedicalrecordsController<T extends Entity<?>> {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(fieldNames);
     }
+    @GetMapping("/doctor/{doctorId}")
+    public List<Medicalrecords> getByDoctorId(@PathVariable int doctorId) {
+        try {
+            Medicalrecords filter = new Medicalrecords();
+            filter.setDoctor_id(doctorId);
+            List<Medicalrecords> records = model.getEntityById(filter);
+
+            for (Medicalrecords record : records) {
+                Patients patientsFilter = new Patients();
+                patientsFilter.setPatient_id(record.getPatient_id());
+                List<Patients> patientsList = model.getEntityById(patientsFilter);
+                record.setPatients(patientsList);
+
+                Doctors doctorsFilter = new Doctors();
+                doctorsFilter.setDoctor_id(record.getDoctor_id());
+                List<Doctors> doctorsList = model.getEntityById(doctorsFilter);
+                record.setDoctors(doctorsList);
+            }
+
+            return records;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
 
 }
