@@ -11,11 +11,6 @@ public class Departments extends Entity<Integer> {
     private String summary;
     private List<Doctors> doctorsList;
 
-    public Departments(String department_name, String location) {
-        this.department_name = department_name;
-        this.location = location;
-    }
-
     public Departments() {
     }
 
