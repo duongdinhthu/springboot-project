@@ -89,7 +89,8 @@ public class SendEmailUsername {
                 "<p>You have successfully booked an appointment at FPT Health.</p>" +
                 "<p><strong>Your department:</strong> " + departmentName + "</p>" +
                 "<p><strong>Your doctor:</strong> " + doctorName + "</p>" +
-                "<p><strong>Your appointment date:</strong> " + medicalDay + "&nbsp" + timeSlot + "</p>" +
+                "<p><strong>Your appointment date:</strong> " + medicalDay + "</p>" +
+                "<p><strong>Your appointment time:</strong>" + timeSlot + "</p>" +
                 "<p>Our staff will contact you to give you detailed instructions. Best regards!</p>" +
                 "</div>" +
                 "</div>" +
@@ -252,7 +253,8 @@ public class SendEmailUsername {
                 "<p>You have a new appointment at FPT Health.</p>" +
                 "<p><strong>Department:</strong> " + departmentName + "</p>" +
                 "<p><strong>Patient:</strong> " + patientName + "</p>" +
-                "<p><strong>Your appointment date:</strong> " + appointmentDate + "&nbsp" + timeSlot + "</p>" +
+                "<p><strong>Your appointment date:</strong> " + appointmentDate + "</p>" +
+                "<p><strong>Your appointment time:</strong>" + timeSlot + "</p>" +
                 "<p>Please check and prepare. Best regards!</p>" +
                 "</div>" +
                 "</div>" +
