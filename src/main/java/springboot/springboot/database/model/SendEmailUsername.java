@@ -14,10 +14,12 @@ public class SendEmailUsername {
         String body = "<html>" +
                 "<head>" +
                 "<style>" +
-                "body { font-family: Arial, sans-serif;margin: 0;padding: 0; }" +
-                ".container { max-width: 600px; height: fit-content; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
-                ".header { background-color: #436FEC; color: white; padding: 10px; text-align: center; border-radius: 8px 8px 0 0; }" +
+                "body { font-family: sans-serif;margin: 0;padding: 0; }" +
+                ".container { min-width: 500px; font-size: 14px; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: none; border-radius: 4px; box-shadow: 0 0 3px rgba(0, 0, 0, 0.3); }" +
+                ".header { background-color: #004B91; color: white; padding: 10px; text-align: center; border-radius: 4px; }" +
                 ".content { padding: 20px; }" +
+                "strong { color: #004B91}" +
+                "li{ list-style: none}" +
                 "</style>" +
                 "</head>" +
                 "<body>" +
@@ -33,7 +35,7 @@ public class SendEmailUsername {
                 "<li><strong>Username:</strong> " + email + "</li>" +
                 "<li><strong>Password:</strong> " + passwordpatient + "</li>" +
                 "</ul>" +
-                "<p>We recommend logging in to update your password for security reasons.</p>" +
+                "<p>We recommend logging in to update your password for security reasons. Additionally, you can also log in as Google. Best regards!</p>" +
                 "</div>" +
                 "</div>" +
                 "</body>" +
@@ -73,10 +75,11 @@ public class SendEmailUsername {
         String body = "<html>" +
                 "<head>" +
                 "<style>" +
-                "body { font-family: Arial, sans-serif;margin: 0;padding: 0; }" +
-                ".container { max-width: 600px; height: fit-content; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
-                ".header { background-color: #436FEC; color: white; padding: 10px; text-align: center; border-radius: 8px 8px 0 0; }" +
+                "body { font-family: sans-serif;margin: 0;padding: 0; }" +
+                ".container { min-width: 500px; font-size: 14px; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: none; border-radius: 4px; box-shadow: 0 0 3px rgba(0, 0, 0, 0.3); }" +
+                ".header { background-color: #004B91; color: white; padding: 10px; text-align: center; border-radius: 4px; }" +
                 ".content { padding: 20px; }" +
+                "strong { color: #004B91}" +
                 "</style>" +
                 "</head>" +
                 "<body>" +
@@ -90,7 +93,7 @@ public class SendEmailUsername {
                 "<p><strong>Your department:</strong> " + departmentName + "</p>" +
                 "<p><strong>Your doctor:</strong> " + doctorName + "</p>" +
                 "<p><strong>Your appointment date:</strong> " + medicalDay + "</p>" +
-                "<p><strong>Your appointment time:</strong>" + timeSlot + "</p>" +
+                "<p><strong>Your appointment time:</strong> " + timeSlot + "</p>" +
                 "<p>Our staff will contact you to give you detailed instructions. Best regards!</p>" +
                 "</div>" +
                 "</div>" +
@@ -131,10 +134,11 @@ public class SendEmailUsername {
         String body = "<html>" +
                 "<head>" +
                 "<style>" +
-                "body { font-family: Arial, sans-serif;margin: 0;padding: 0; }" +
-                ".container { max-width: 600px; height: fit-content; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
-                ".header { background-color: #436FEC; color: white; padding: 10px; text-align: center; border-radius: 8px 8px 0 0; }" +
+                "body { font-family: sans-serif;margin: 0;padding: 0; }" +
+                ".container { min-width: 500px; font-size: 14px; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: none; border-radius: 4px; box-shadow: 0 0 3px rgba(0, 0, 0, 0.3); }" +
+                ".header { background-color: #004B91; color: white; padding: 10px; text-align: center; border-radius: 4px; }" +
                 ".content { padding: 20px; }" +
+                "strong { color: #004B91}" +
                 "</style>" +
                 "</head>" +
                 "<body>" +
@@ -187,10 +191,11 @@ public class SendEmailUsername {
         String body = "<html>" +
                 "<head>" +
                 "<style>" +
-                "body { font-family: Arial, sans-serif;margin: 0;padding: 0; }" +
-                ".container { max-width: 600px; height: fit-content; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
-                ".header { background-color: #436FEC; color: white; padding: 10px; text-align: center; border-radius: 8px 8px 0 0; }" +
+                "body { font-family: sans-serif;margin: 0;padding: 0; }" +
+                ".container { min-width: 500px; font-size: 14px; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: none; border-radius: 4px; box-shadow: 0 0 3px rgba(0, 0, 0, 0.3); }" +
+                ".header { background-color: #004B91; color: white; padding: 10px; text-align: center; border-radius: 4px; }" +
                 ".content { padding: 20px; }" +
+                "strong { color: #004B91}" +
                 "</style>" +
                 "</head>" +
                 "<body>" +
@@ -237,10 +242,11 @@ public class SendEmailUsername {
         String body = "<html>" +
                 "<head>" +
                 "<style>" +
-                "body { font-family: Arial, sans-serif;margin: 0;padding: 0; }" +
-                ".container { max-width: 600px; height: fit-content; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
-                ".header { background-color: #436FEC; color: white; padding: 10px; text-align: center; border-radius: 8px 8px 0 0; }" +
+                "body { font-family: sans-serif;margin: 0;padding: 0; }" +
+                ".container { min-width: 500px; font-size: 14px; margin: 20px auto; padding: 20px; background-color: #f0f0f0; border: none; border-radius: 4px; box-shadow: 0 0 3px rgba(0, 0, 0, 0.3); }" +
+                ".header { background-color: #004B91; color: white; padding: 10px; text-align: center; border-radius: 4px; }" +
                 ".content { padding: 20px; }" +
+                "strong { color: #004B91}" +
                 "</style>" +
                 "</head>" +
                 "<body>" +
@@ -254,7 +260,7 @@ public class SendEmailUsername {
                 "<p><strong>Department:</strong> " + departmentName + "</p>" +
                 "<p><strong>Patient:</strong> " + patientName + "</p>" +
                 "<p><strong>Your appointment date:</strong> " + appointmentDate + "</p>" +
-                "<p><strong>Your appointment time:</strong>" + timeSlot + "</p>" +
+                "<p><strong>Your appointment time:</strong> " + timeSlot + "</p>" +
                 "<p>Please check and prepare. Best regards!</p>" +
                 "</div>" +
                 "</div>" +

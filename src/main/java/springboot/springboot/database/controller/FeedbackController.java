@@ -34,7 +34,7 @@ public class FeedbackController {
 
             model.saveFeedback(feedback);
 
-            return ResponseEntity.ok("Cảm ơn bạn đã gửi ý kiến!");
+            return ResponseEntity.ok("Thank you for your feedback!");
         } catch (SQLException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra, vui lòng thử lại.");
