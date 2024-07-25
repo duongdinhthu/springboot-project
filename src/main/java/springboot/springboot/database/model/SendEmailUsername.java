@@ -201,7 +201,7 @@ public class SendEmailUsername {
                 "<body>" +
                 "<div class='container'>" +
                 "<div class='header'>" +
-                "<h2>Password Reset Request</h2>" +
+                "<h2>Reply from Admin</h2>" +
                 "</div>" +
                 "<div class='content'>" +
                 "<p>Hi <strong>" + name + "</strong>,</p>" +
