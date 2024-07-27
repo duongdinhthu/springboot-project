@@ -187,7 +187,7 @@ public class SendEmailUsername {
     public void sendEmailReply(String name, String email, String message) {
         final String username = "thuddth2307004@fpt.edu.vn";
         final String password = "kyxm zvbz nvsn uxxx";
-        String subject = "Reply from Admin";
+        String subject = "Feedback Reply";
         String body = "<html>" +
                 "<head>" +
                 "<style>" +
@@ -201,7 +201,7 @@ public class SendEmailUsername {
                 "<body>" +
                 "<div class='container'>" +
                 "<div class='header'>" +
-                "<h2>Reply from Admin</h2>" +
+                "<h2>Thanks for your feedback</h2>" +
                 "</div>" +
                 "<div class='content'>" +
                 "<p>Hi <strong>" + name + "</strong>,</p>" +
