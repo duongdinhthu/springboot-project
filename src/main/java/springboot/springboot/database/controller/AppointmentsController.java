@@ -3,6 +3,7 @@ package springboot.springboot.database.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springboot.springboot.database.entity.*;
@@ -361,5 +362,40 @@ public class AppointmentsController<T extends Entity<?>> {
             @RequestParam(required = false) String status) throws SQLException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
         return model.searchAppointmentsByCriteria(start_date, end_date, status);
     }
+    @GetMapping("/{appointmentId}")
+    public ResponseEntity<Appointments> getAppointmentDetails(@PathVariable int appointmentId) throws SQLException, IllegalAccessException, InstantiationException {
+        Appointments appointment = new Appointments();
+        appointment.setAppointment_id(appointmentId);
+        List<Appointments> appointmentsList = model.getEntityById(appointment);
+
+        if (appointmentsList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Appointments detailedAppointment = appointmentsList.get(0);
+
+        // Fetch patient details
+        if (detailedAppointment.getPatient_id() != null) {
+            Patients patientFilter = new Patients();
+            patientFilter.setPatient_id(detailedAppointment.getPatient_id());
+            List<Patients> patientList = model.getEntityById(patientFilter);
+            if (!patientList.isEmpty()) {
+                detailedAppointment.setPatient(patientList);
+            }
+        }
+
+        // Fetch doctor details
+        if (detailedAppointment.getDoctor_id() != null) {
+            Doctors doctorFilter = new Doctors();
+            doctorFilter.setDoctor_id(detailedAppointment.getDoctor_id());
+            List<Doctors> doctorList = model.getEntityById(doctorFilter);
+            if (!doctorList.isEmpty()) {
+                detailedAppointment.setDoctor(doctorList);
+            }
+        }
+
+        return ResponseEntity.ok(detailedAppointment);
+    }
+
 
 }

@@ -395,4 +395,16 @@ public class PatientsController<T extends Entity<?>> {
         System.out.println(keyword);
         return model.searchPatientsByKeyword(keyword);
     }
+    @GetMapping("/{patientId}")
+    public ResponseEntity<Patients> getPatientById(@PathVariable int patientId) throws SQLException, IllegalAccessException, InstantiationException {
+        Patients patientFilter = new Patients();
+        patientFilter.setPatient_id(patientId);
+        List<Patients> patientsList = model.getEntityById(patientFilter);
+        if (patientsList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        Patients patient = patientsList.get(0);
+        return ResponseEntity.ok(patient);
+    }
+
 }
