@@ -1,5 +1,6 @@
 package springboot.springboot.database.controller;
 
+import org.springframework.http.HttpStatus;
 import springboot.springboot.database.entity.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
@@ -203,6 +204,21 @@ public class StaffsController<T extends Entity<?>> {
     @GetMapping("/search-new")
     public List<Staffs> searchStaffsByKeyword(@RequestParam("keyword") String keyword) throws Exception {
         return model.searchStaffsByKeyword(keyword);
+    }
+    @GetMapping("/{staffId}")
+    public ResponseEntity<Staffs> getStaffById(@PathVariable("staffId") int staffId) {
+        try {
+            Staffs staffFilter = new Staffs();
+            staffFilter.setStaff_id(staffId);
+            List<Staffs> staffs = model.getEntityById(staffFilter);
+            if (staffs.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            return ResponseEntity.ok(staffs.get(0));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
 }
