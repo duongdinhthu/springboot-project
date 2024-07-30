@@ -11,6 +11,7 @@ public class Staffs extends Entity<Integer> {
     private String staff_status;
     private String staff_username;
     private String staff_password;
+    private String staff_email;
     private List<Appointments> appointmentsList;
     public Staffs() {}
 
@@ -20,6 +21,14 @@ public class Staffs extends Entity<Integer> {
 
     public void setStaff_id(Integer staff_id) {
         this.staff_id = staff_id;
+    }
+
+    public String getStaff_email() {
+        return staff_email;
+    }
+
+    public void setStaff_email(String staff_email) {
+        this.staff_email = staff_email;
     }
 
     public String getStaff_name() {

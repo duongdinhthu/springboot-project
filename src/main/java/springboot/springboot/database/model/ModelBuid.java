@@ -5,8 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.reflections.Reflections;
 import org.springframework.stereotype.Component;
-import springboot.springboot.database.entity.Entity;
-import springboot.springboot.database.entity.Feedback;
+import springboot.springboot.database.entity.*;
+
+import javax.persistence.Column;
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -661,4 +662,164 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
             stmt.executeUpdate();
         }
     }
+
+
+    // Phương thức tìm kiếm cho Doctors
+
+    public List<Doctors> searchDoctorsByKeyword(String keyword) throws SQLException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+        List<Doctors> entities = new ArrayList<>();
+        String query = buildSearchQueryDoctor(Doctors.class, keyword);
+        try (Connection connection = openConnection();
+             PreparedStatement pstm = openPstm(query, connection)) {
+            pstm.setString(1, "%" + keyword + "%");
+            pstm.setString(2, "%" + keyword + "%");
+            try (ResultSet rs = pstm.executeQuery()) {
+                while (rs.next()) {
+                    Doctors entity = createEntityFromResultSetForSearch(rs, Doctors.class);
+                    entities.add(entity);
+                }
+            }
+        }
+        return entities;
+    }
+
+    public List<Patients> searchPatientsByKeyword(String keyword) throws SQLException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+        List<Patients> entities = new ArrayList<>();
+        String query = buildSearchQueryPatient(Patients.class, keyword);
+        try (Connection connection = openConnection();
+             PreparedStatement pstm = openPstm(query, connection)) {
+            pstm.setString(1, "%" + keyword + "%");
+            pstm.setString(2, "%" + keyword + "%");
+            try (ResultSet rs = pstm.executeQuery()) {
+                while (rs.next()) {
+                    Patients entity = createEntityFromResultSetForSearch(rs, Patients.class);
+                    System.out.println(entity.toString());
+                    entities.add(entity);
+                }
+            }
+        }
+        System.out.println(query);
+        return entities;
+    }
+
+    public List<Staffs> searchStaffsByKeyword(String keyword) throws SQLException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+        List<Staffs> entities = new ArrayList<>();
+        String query = buildSearchQueryStaff(Staffs.class, keyword);
+        try (Connection connection = openConnection();
+             PreparedStatement pstm = openPstm(query, connection)) {
+            pstm.setString(1, "%" + keyword + "%");
+            pstm.setString(2, "%" + keyword + "%");
+            try (ResultSet rs = pstm.executeQuery()) {
+                while (rs.next()) {
+                    Staffs entity = createEntityFromResultSetForSearch(rs, Staffs.class);
+                    entities.add(entity);
+                }
+            }
+        }
+        return entities;
+    }
+
+    private String buildSearchQueryPatient(Class<?> entityClass, String keyword) {
+        StringBuilder query = new StringBuilder("SELECT * FROM ");
+        query.append(getTableNameForSearch(entityClass)).append(" WHERE patient_name LIKE ? OR patient_email LIKE ?");
+        return query.toString();
+    }
+
+    private String buildSearchQueryStaff(Class<?> entityClass, String keyword) {
+        StringBuilder query = new StringBuilder("SELECT * FROM ");
+        query.append(getTableNameForSearch(entityClass)).append(" WHERE staff_name LIKE ? OR staff_email LIKE ?");
+        return query.toString();
+    }
+
+    private String buildSearchQueryDoctor(Class<?> entityClass, String keyword) {
+        StringBuilder query = new StringBuilder("SELECT * FROM ");
+        query.append(getTableNameForSearch(entityClass)).append(" WHERE doctor_name LIKE ? OR doctor_email LIKE ?");
+        return query.toString();
+    }
+
+    private <T extends Entity<?>> T createEntityFromResultSetForSearch(ResultSet rs, Class<T> entityClass) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        T entity = entityClass.getDeclaredConstructor().newInstance();
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
+        for (int i = 1; i <= columnCount; i++) {
+            String columnName = metaData.getColumnName(i);
+            Field field = null;
+            try {
+                field = entityClass.getDeclaredField(columnName);
+            } catch (NoSuchFieldException e) {
+                continue;
+            }
+            field.setAccessible(true);
+            Object value = rs.getObject(columnName);
+            if (value != null) {
+                if (field.getType().equals(LocalDateTime.class) && value instanceof Timestamp) {
+                    field.set(entity, ((Timestamp) value).toLocalDateTime());
+                } else {
+                    field.set(entity, value);
+                }
+            }
+        }
+        return entity;
+    }
+
+    private String getTableNameForSearch(Class<?> entityClass) {
+        return entityClass.getSimpleName().toLowerCase();
+    }
+
+
+
+    public List<Appointments> searchAppointmentsByCriteria(String startDate, String endDate, String status) throws SQLException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+        List<Appointments> appointmentsList = new ArrayList<>();
+        StringBuilder query = new StringBuilder("SELECT * FROM appointments WHERE 1=1");
+
+        if (startDate != null && !startDate.isEmpty()) {
+            query.append(" AND medical_day >= '").append(startDate).append("'");
+        }
+        if (endDate != null && !endDate.isEmpty()) {
+            query.append(" AND medical_day <= '").append(endDate).append("'");
+        }
+        if (status != null && !status.isEmpty()) {
+            query.append(" AND status = '").append(status).append("'");
+        }
+
+        try (Connection connection = openConnection();
+             PreparedStatement pstm = openPstm(query.toString(), connection);
+             ResultSet rs = exQuery(pstm)) {
+            while (rs.next()) {
+                Appointments appointment = createAppointmentFromResultSet(rs);
+                appointmentsList.add(appointment);
+            }
+        }
+
+        return appointmentsList;
+    }
+
+    // Các phương thức khác...
+
+    private Appointments createAppointmentFromResultSet(ResultSet rs) throws SQLException, IllegalAccessException {
+        Appointments appointment = new Appointments();
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
+
+        for (int i = 1; i <= columnCount; i++) {
+            String columnName = metaData.getColumnName(i);
+            Field field;
+            try {
+                field = Appointments.class.getDeclaredField(columnName);
+            } catch (NoSuchFieldException e) {
+                continue;
+            }
+            field.setAccessible(true);
+            Object value = rs.getObject(columnName);
+            if (value != null) {
+                if (field.getType().equals(LocalDateTime.class) && value instanceof Timestamp) {
+                    field.set(appointment, ((Timestamp) value).toLocalDateTime());
+                } else {
+                    field.set(appointment, value);
+                }
+            }
+        }
+        return appointment;
+    }
+
 }

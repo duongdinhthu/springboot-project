@@ -200,5 +200,9 @@ public class StaffsController<T extends Entity<?>> {
         }
     }
 
+    @GetMapping("/search-new")
+    public List<Staffs> searchStaffsByKeyword(@RequestParam("keyword") String keyword) throws Exception {
+        return model.searchStaffsByKeyword(keyword);
+    }
 
 }

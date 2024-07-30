@@ -10,7 +10,9 @@ import springboot.springboot.database.model.AppointmentLockManager;
 import springboot.springboot.database.model.ModelBuid;
 import springboot.springboot.database.model.SendEmailUsername;
 import springboot.springboot.database.model.EntityToJSON;
+
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -259,12 +261,12 @@ public class AppointmentsController<T extends Entity<?>> {
             String timeSlot = emailData.get("timeSlot");
 
             // In ra các giá trị nhận được để kiểm tra
-            System.out.println("Doctor Name: "+doctorName);
-            System.out.println("Department Name: "+departmentName);
-            System.out.println("Appointment Date: "+appointmentDate);
-            System.out.println("Doctor Email: "+doctorEmail);
-            System.out.println("Patient Name: "+patientName);
-            System.out.println("Time Slot: "+timeSlot);
+            System.out.println("Doctor Name: " + doctorName);
+            System.out.println("Department Name: " + departmentName);
+            System.out.println("Appointment Date: " + appointmentDate);
+            System.out.println("Doctor Email: " + doctorEmail);
+            System.out.println("Patient Name: " + patientName);
+            System.out.println("Time Slot: " + timeSlot);
 
             sendEmail.sendEmailToDoctor(doctorName, departmentName, appointmentDate, doctorEmail, patientName, timeSlot);
             return ResponseEntity.ok("Email sent to doctor successfully");
@@ -324,6 +326,7 @@ public class AppointmentsController<T extends Entity<?>> {
 
         return ResponseEntity.ok(lockedSlots);
     }
+
     @GetMapping("/today")
     public ResponseEntity<List<Appointments>> getTodaysAppointments(@RequestParam int doctor_id) {
         LocalDate today = LocalDate.now();
@@ -349,6 +352,14 @@ public class AppointmentsController<T extends Entity<?>> {
         }
 
         return ResponseEntity.ok(appointmentsList);
+    }
+
+    @GetMapping("/search-new")
+    public List<Appointments> searchAppointments(
+            @RequestParam(required = false) String start_date,
+            @RequestParam(required = false) String end_date,
+            @RequestParam(required = false) String status) throws SQLException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+        return model.searchAppointmentsByCriteria(start_date, end_date, status);
     }
 
 }

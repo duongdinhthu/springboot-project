@@ -225,4 +225,9 @@ public class DoctorsController<T extends Entity<?>> {
         }
         return ResponseEntity.ok(doctors.get(0));
     }
+    @GetMapping("/search-new")
+    public List<Doctors> searchDoctorsByKeyword(@RequestParam("keyword") String keyword) throws Exception {
+        return model.searchDoctorsByKeyword(keyword);
+    }
+
 }

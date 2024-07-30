@@ -390,4 +390,9 @@ public class PatientsController<T extends Entity<?>> {
             model.update(patient);
         }
     }
+    @GetMapping("/search-new")
+    public List<Patients> searchPatientsByKeyword(@RequestParam("keyword") String keyword) throws Exception {
+        System.out.println(keyword);
+        return model.searchPatientsByKeyword(keyword);
+    }
 }
