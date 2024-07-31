@@ -821,5 +821,44 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         }
         return appointment;
     }
+    public List<Appointments> searchAppointmentsByCriteriaAndDoctor(String startDate, String endDate, String status, int doctorId) throws SQLException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+        List<Appointments> appointmentsList = new ArrayList<>();
+        StringBuilder query = new StringBuilder("SELECT * FROM appointments WHERE doctor_id = ?");
+
+        if (startDate != null && !startDate.isEmpty()) {
+            query.append(" AND medical_day >= ?");
+        }
+        if (endDate != null && !endDate.isEmpty()) {
+            query.append(" AND medical_day <= ?");
+        }
+        if (status != null && !status.isEmpty()) {
+            query.append(" AND status = ?");
+        }
+
+        try (Connection connection = openConnection();
+             PreparedStatement pstm = openPstm(query.toString(), connection)) {
+            int paramIndex = 1;
+            pstm.setInt(paramIndex++, doctorId);
+
+            if (startDate != null && !startDate.isEmpty()) {
+                pstm.setString(paramIndex++, startDate);
+            }
+            if (endDate != null && !endDate.isEmpty()) {
+                pstm.setString(paramIndex++, endDate);
+            }
+            if (status != null && !status.isEmpty()) {
+                pstm.setString(paramIndex++, status);
+            }
+
+            try (ResultSet rs = exQuery(pstm)) {
+                while (rs.next()) {
+                    Appointments appointment = createAppointmentFromResultSet(rs);
+                    appointmentsList.add(appointment);
+                }
+            }
+        }
+
+        return appointmentsList;
+    }
 
 }

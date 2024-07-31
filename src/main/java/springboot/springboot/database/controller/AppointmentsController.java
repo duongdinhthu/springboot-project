@@ -396,6 +396,19 @@ public class AppointmentsController<T extends Entity<?>> {
 
         return ResponseEntity.ok(detailedAppointment);
     }
+    @GetMapping("/searchByCriteriaAndDoctor")
+    public List<Appointments> searchByCriteriaAndDoctor(@RequestParam Map<String, String> requestParams) {
+        try {
+            String startDate = requestParams.get("start_date");
+            String endDate = requestParams.get("end_date");
+            String status = requestParams.get("status");
+            int doctorId = Integer.parseInt(requestParams.get("doctor_id"));
 
+            return model.searchAppointmentsByCriteriaAndDoctor(startDate, endDate, status, doctorId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
 
 }
