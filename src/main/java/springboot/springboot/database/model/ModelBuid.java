@@ -778,6 +778,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         if (endDate != null && !endDate.isEmpty()) {
             query.append(" AND medical_day <= '").append(endDate).append("'");
         }
+
         if (status != null && !status.isEmpty()) {
             query.append(" AND status = '").append(status).append("'");
         }
