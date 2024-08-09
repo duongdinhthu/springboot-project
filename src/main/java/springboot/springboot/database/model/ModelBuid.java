@@ -6,8 +6,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.reflections.Reflections;
 import org.springframework.stereotype.Component;
 import springboot.springboot.database.entity.*;
-
-import javax.persistence.Column;
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
