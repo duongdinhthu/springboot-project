@@ -1,5 +1,6 @@
 package springboot.springboot.database.entity;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -12,13 +13,28 @@ public class Medicalrecords extends Entity<Integer> {
     private String prescription;
     private Date follow_up_date;
     private Integer doctor_id;
-    private String test_urine;
-    private String test_blood;
-    private String x_ray;
+
     private List<Patients> patients;
     private List<Doctors> doctors;
-
+    private BigDecimal severity;
+    private String image;
     public Medicalrecords() {
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public BigDecimal getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(BigDecimal severity) {
+        this.severity = severity;
     }
 
     public Integer getRecord_id() {
@@ -85,29 +101,7 @@ public class Medicalrecords extends Entity<Integer> {
         this.doctor_id = doctor_id;
     }
 
-    public String getTest_urine() {
-        return test_urine;
-    }
 
-    public void setTest_urine(String test_urine) {
-        this.test_urine = test_urine;
-    }
-
-    public String getTest_blood() {
-        return test_blood;
-    }
-
-    public void setTest_blood(String test_blood) {
-        this.test_blood = test_blood;
-    }
-
-    public String getX_ray() {
-        return x_ray;
-    }
-
-    public void setX_ray(String x_ray) {
-        this.x_ray = x_ray;
-    }
 
     public List<Patients> getPatients() {
         return patients;
@@ -136,11 +130,9 @@ public class Medicalrecords extends Entity<Integer> {
                 ", prescription='" + prescription + '\'' +
                 ", follow_up_date=" + follow_up_date +
                 ", doctor_id=" + doctor_id +
-                ", test_urine='" + test_urine + '\'' +
-                ", test_blood='" + test_blood + '\'' +
-                ", x_ray='" + x_ray + '\'' +
                 ", patients=" + patients +
                 ", doctors=" + doctors +
+                ", severity=" + severity +
                 '}';
     }
 }

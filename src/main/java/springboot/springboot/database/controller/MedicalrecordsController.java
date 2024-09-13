@@ -3,14 +3,20 @@ package springboot.springboot.database.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springboot.springboot.database.entity.*;
 import springboot.springboot.database.model.EntityToJSON;
 import springboot.springboot.database.model.ModelBuid;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,6 +34,7 @@ public class MedicalrecordsController<T extends Entity<?>> {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
         Medicalrecords medicalrecords = modelMapper.map(requestData, Medicalrecords.class);
+        System.out.println("Severity: " + medicalrecords.getSeverity() + "==========");
         model.insert(medicalrecords);
     }
 
@@ -72,6 +79,7 @@ public class MedicalrecordsController<T extends Entity<?>> {
             modelMapper.addConverter(new StringToDateConverter());
 
             Medicalrecords medicalrecords1 = modelMapper.map(requestParams, Medicalrecords.class);
+            System.out.println(medicalrecords1.toString()+"=======");
             List<Medicalrecords> medicalrecords = model.getEntityById(medicalrecords1);
 
             for (Medicalrecords record : medicalrecords) {
@@ -84,9 +92,14 @@ public class MedicalrecordsController<T extends Entity<?>> {
                 newRecord.setPatients(patientsList);
 
                 Doctors doctorsFilter = new Doctors();
-                doctorsFilter.setDoctor_id(record.getDoctor_id());
-                List<Doctors> doctorsList = model.getEntityById(doctorsFilter);
-                newRecord.setDoctors(doctorsList);
+                if (record.getDoctor_id() != null) {
+                    doctorsFilter.setDoctor_id(record.getDoctor_id());
+                    List<Doctors> doctorsList = model.getEntityById(doctorsFilter);
+                    newRecord.setDoctors(doctorsList);
+                } else {
+                    // Nếu không có doctor_id, có thể set null hoặc giá trị mặc định
+                    newRecord.setDoctors(null);
+                }
 
                 medicalrecordsList.add(newRecord);
             }
@@ -144,6 +157,40 @@ public class MedicalrecordsController<T extends Entity<?>> {
             e.printStackTrace();
             return new ArrayList<>();
         }
+    }
+    @PostMapping("/images/upload")
+    public ResponseEntity<Map<String, Object>> uploadImages(@RequestParam("files") MultipartFile[] files) {
+        List<String> imagePaths = new ArrayList<>();
+
+        for (MultipartFile file : files) {
+            try {
+                // Đường dẫn nơi lưu ảnh
+                String uploadDir = "uploads/images/";
+                String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+
+                // Sử dụng replace để thay thế dấu \ thành /
+                String filePathString = uploadDir + fileName.replace("\\", "/");
+                Path filePath = Paths.get(filePathString);
+
+                // Tạo thư mục nếu chưa tồn tại
+                Files.createDirectories(filePath.getParent());
+
+                // Lưu file vào hệ thống
+                Files.write(filePath, file.getBytes());
+
+                // Thêm đường dẫn file vào danh sách trả về (sử dụng dấu /)
+                imagePaths.add(filePathString);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            }
+        }
+
+        // Trả về danh sách đường dẫn ảnh đã lưu
+        Map<String, Object> response = new HashMap<>();
+        response.put("paths", imagePaths);
+        return ResponseEntity.ok(response);
     }
 
 }

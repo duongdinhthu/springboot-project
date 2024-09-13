@@ -42,10 +42,11 @@ public class PatientsController<T extends Entity<?>> {
 
     @PutMapping("/update")
     public void update(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
-        System.out.println("call appi");
+        System.out.println("==================================================================================================================");
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new StringToDateConverter());
         Patients patients = modelMapper.map(requestData, Patients.class);
+        System.out.println("Mapped patient: " + patients);
 
         // Đảm bảo rằng đường dẫn ảnh được bao gồm trong requestData
         if (requestData.containsKey("patient_img")) {
@@ -110,10 +111,11 @@ public class PatientsController<T extends Entity<?>> {
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) throws Exception {
         String patientUsername = loginRequest.get("email");
         String patientPassword = loginRequest.get("password");
+        System.out.println("ok");
+
         Patients patientExample = new Patients();
         patientExample.setPatient_username(patientUsername);
         patientExample.setPatient_password(patientPassword);
-
         List<Patients> patients = model.getEntityById(patientExample);
 
         if (!patients.isEmpty()) {
@@ -301,12 +303,7 @@ public class PatientsController<T extends Entity<?>> {
 
         // Map các trường từ request sang đối tượng Patients
         Patients newPatient = modelMapper.map(registerRequest, Patients.class);
-
-        // In ra các giá trị để kiểm tra
-        System.out.println("patient_name: " + newPatient.getPatient_name());
-        System.out.println("patient_email: " + newPatient.getPatient_email());
-        System.out.println("patient_password: " + newPatient.getPatient_password());
-        System.out.println("patient_username: " + newPatient.getPatient_username());
+        newPatient.setPatient_username(newPatient.getPatient_email());
 
         // Kiểm tra xem email đã được sử dụng chưa
         Patients existingPatient = new Patients();
@@ -314,15 +311,25 @@ public class PatientsController<T extends Entity<?>> {
 
         List<Patients> patientsList = model.getEntityById(existingPatient);
 
+        // Nếu email đã được đăng ký
         if (!patientsList.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already registered.");
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Collections.singletonMap("error", "Email already registered."));
         }
 
         // Lưu trữ đối tượng mới vào cơ sở dữ liệu
         model.insert(newPatient);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(Collections.singletonMap("username", newPatient.getPatient_name()));
+        // Tạo phản hồi chứa thông tin cần thiết
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Registration successful.");
+        response.put("patient_id", newPatient.getPatient_id()); // Giả sử đối tượng newPatient có trường này
+        response.put("username", newPatient.getPatient_username());
+
+        // Trả về response với status 201 Created và thông tin cần thiết
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
     @PostMapping("/change-password")
     public void changePassword(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException, InstantiationException {
         ModelMapper modelMapper = new ModelMapper();
