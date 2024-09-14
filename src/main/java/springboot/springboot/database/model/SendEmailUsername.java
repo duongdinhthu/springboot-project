@@ -68,6 +68,8 @@ public class SendEmailUsername {
         }
     }
 
+
+    
     public void sendEmailFormRegister(String doctorName, String departmentName, String medicalDay, String patientEmail, String patientName,String timeSlot) {
         final String username = "thuddth2307004@fpt.edu.vn";
         final String password = "kyxm zvbz nvsn uxxx";
