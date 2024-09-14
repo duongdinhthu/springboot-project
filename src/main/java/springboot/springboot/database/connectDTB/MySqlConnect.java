@@ -7,11 +7,12 @@ import java.sql.SQLException;
 public class MySqlConnect {
 
     public static Connection getMySQLConnection() throws SQLException {
-        String hostName = "127.0.0.1"; // 127.0.1 hoặc localhost
+        // Thông tin kết nối cơ sở dữ liệu Azure MySQL
+        String hostName = "fpthealth.mysql.database.azure.com";
         String dbName = "fpthealth";
-        String userName = "root";
-        String password = "";
-        String connectionURL = "jdbc:mysql://" + hostName + ":3306/" + dbName;
+        String userName = "duongthu";
+        String password = "Thu@456258"; // Đặt mật khẩu của bạn
+        String connectionURL = "jdbc:mysql://" + hostName + ":3306/" + dbName + "?useSSL=true&requireSSL=true";
         return DriverManager.getConnection(connectionURL, userName, password);
     }
 }
