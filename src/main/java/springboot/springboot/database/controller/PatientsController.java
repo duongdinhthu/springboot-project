@@ -17,9 +17,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @RestController
@@ -42,44 +39,6 @@ public class PatientsController<T extends Entity<?>> {
         Patients patients = modelMapper.map(requestData, Patients.class);
         model.insert(patients);
     }
-
-    @PutMapping("/update")
-    public void update(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
-        System.out.println("==================================================================================================================");
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.addConverter(new StringToDateConverter());
-        Patients patients = modelMapper.map(requestData, Patients.class);
-        System.out.println("Mapped patient: " + patients);
-
-        // Đảm bảo rằng đường dẫn ảnh được bao gồm trong requestData
-        if (requestData.containsKey("patient_img")) {
-            patients.setPatient_img((String) requestData.get("patient_img"));
-        }
-
-        // Chuyển đổi ngày sinh (patient_dob) sang LocalDate nếu nó tồn tại trong requestData
-        if (requestData.containsKey("patient_dob")) {
-            String dobString = (String) requestData.get("patient_dob");
-            try {
-                // Chỉ định dạng yyyy-MM-dd
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                // Phân tích chuỗi ngày thành LocalDate
-                LocalDate date = LocalDate.parse(dobString, formatter);
-                // Thiết lập lại ngày sinh cho bệnh nhân
-                patients.setPatient_dob(date);
-            } catch (DateTimeParseException e) {
-                e.printStackTrace();
-                // Xử lý ngoại lệ nếu có lỗi phân tích ngày
-            }
-        }
-
-        // Set các danh sách khác về null để tránh lỗi ánh xạ không cần thiết
-        patients.setAppointmentsList(null);
-        patients.setMedicalrecordsList(null);
-
-        // Cập nhật bệnh nhân
-        model.update(patients);
-    }
-
 
     @DeleteMapping("/delete")
     public String delete(@RequestBody Map<String, Object> requestData) throws SQLException, IllegalAccessException {
