@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -51,6 +53,22 @@ public class PatientsController<T extends Entity<?>> {
         // Đảm bảo rằng đường dẫn ảnh được bao gồm trong requestData
         if (requestData.containsKey("patient_img")) {
             patients.setPatient_img((String) requestData.get("patient_img"));
+        }
+
+        // Chuyển đổi ngày sinh (patient_dob) sang định dạng yyyy-MM-dd
+        if (requestData.containsKey("patient_dob")) {
+            String dobString = (String) requestData.get("patient_dob");
+            try {
+                // Chỉ định dạng yyyy-MM-dd
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                // Phân tích chuỗi ngày
+                Date date = formatter.parse(dobString);
+                // Thiết lập lại ngày sinh cho bệnh nhân
+                patients.setPatient_dob(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                // Xử lý ngoại lệ nếu có lỗi phân tích ngày
+            }
         }
 
         // Set các danh sách khác về null để tránh lỗi ánh xạ không cần thiết
