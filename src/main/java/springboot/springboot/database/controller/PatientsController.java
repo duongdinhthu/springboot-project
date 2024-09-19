@@ -87,8 +87,8 @@ public class PatientsController<T extends Entity<?>> {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) throws Exception {
-        String patientUsername = loginRequest.get("email");
-        String patientPassword = loginRequest.get("password");
+        String patientUsername = loginRequest.get("patient_email");
+        String patientPassword = loginRequest.get("patient_password");
         System.out.println("ok");
 
         Patients patientExample = new Patients();
@@ -99,7 +99,7 @@ public class PatientsController<T extends Entity<?>> {
         if (!patients.isEmpty()) {
             Patients patient = patients.get(0);
             Map<String, Object> response = new HashMap<>();
-            response.put("username", patient.getPatient_name());
+            response.put("patient_username", patient.getPatient_name());
             response.put("patient_id", patient.getPatient_id()); // Thêm patient_id vào phản hồi
             return ResponseEntity.ok(response);
         } else {
@@ -110,9 +110,9 @@ public class PatientsController<T extends Entity<?>> {
 
     @PostMapping("/google-login")
     public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> request) throws Exception {
-        String email = request.get("email");
-        String name = request.get("name");
-        String password = request.get("password");
+        String email = request.get("patient_email");
+        String name = request.get("patient_name");
+        String password = request.get("patient_password");
         System.out.println("gglogin");
         Patients patient = new Patients();
         patient.setPatient_email(email);
@@ -129,7 +129,7 @@ public class PatientsController<T extends Entity<?>> {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("username", patient.getPatient_name());
+        response.put("patient_username", patient.getPatient_name());
         response.put("patient_id", patient.getPatient_id()); // Thêm patient_id vào phản hồi
 
         return ResponseEntity.ok(response);
@@ -160,12 +160,12 @@ public class PatientsController<T extends Entity<?>> {
         }
 
         Map<String, Object> userInfo = response.getBody();
-        if (userInfo == null || !userInfo.containsKey("email") || !userInfo.containsKey("name")) {
+        if (userInfo == null || !userInfo.containsKey("patient_email") || !userInfo.containsKey("patient_name")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Facebook response");
         }
 
-        String email = (String) userInfo.get("email");
-        String name = (String) userInfo.get("name");
+        String email = (String) userInfo.get("patient_email");
+        String name = (String) userInfo.get("patient_name");
 
         Patients patient = new Patients();
         patient.setPatient_email(email);
@@ -182,7 +182,7 @@ public class PatientsController<T extends Entity<?>> {
         }
 
         Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("username", patient.getPatient_name());
+        responseBody.put("patient_username", patient.getPatient_name());
         responseBody.put("patient_id", patient.getPatient_id()); // Thêm patient_id vào phản hồi
 
         return ResponseEntity.ok(responseBody);
@@ -302,7 +302,7 @@ public class PatientsController<T extends Entity<?>> {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Registration successful.");
         response.put("patient_id", newPatient.getPatient_id()); // Giả sử đối tượng newPatient có trường này
-        response.put("username", newPatient.getPatient_username());
+        response.put("patient_username", newPatient.getPatient_username());
 
         // Trả về response với status 201 Created và thông tin cần thiết
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -333,7 +333,7 @@ public class PatientsController<T extends Entity<?>> {
     }
 
     @PostMapping("/upload-image")
-    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("image") MultipartFile image, @RequestParam("patient_id") Integer patientId) {
+    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("patient_image") MultipartFile image, @RequestParam("patient_id") Integer patientId) {
         String imagePath = ""; // Tùy chỉnh logic lưu trữ và đường dẫn ảnh
 
         try {
