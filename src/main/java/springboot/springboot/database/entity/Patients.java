@@ -7,7 +7,7 @@ import java.util.List;
 public class Patients extends Entity<Integer> {
     private Integer patient_id;
     private String patient_name;
-    private LocalDate patient_dob; // Thay đổi kiểu dữ liệu từ Date sang LocalDate
+    private Date patient_dob; // Thay đổi kiểu dữ liệu từ Date sang LocalDate
     private String patient_email;
     private Integer patient_phone;
     private String patient_address;
@@ -38,12 +38,11 @@ public class Patients extends Entity<Integer> {
         this.patient_name = patient_name;
     }
 
-
-    public LocalDate getPatient_dob() {
+    public Date getPatient_dob() {
         return patient_dob;
     }
 
-    public void setPatient_dob(LocalDate patient_dob) {
+    public void setPatient_dob(Date patient_dob) {
         this.patient_dob = patient_dob;
     }
 
@@ -125,24 +124,5 @@ public class Patients extends Entity<Integer> {
 
     public void setPatient_img(String patient_img) {
         this.patient_img = patient_img;
-    }
-
-    @Override
-    public String toString() {
-        return "Patients{" +
-                "patient_id=" + patient_id +
-                ", patient_name='" + patient_name + '\'' +
-                ", patient_dob=" + patient_dob +
-                ", patient_email='" + patient_email + '\'' +
-                ", patient_phone=" + patient_phone +
-                ", patient_address='" + patient_address + '\'' +
-                ", patient_password='" + patient_password + '\'' +
-                ", patient_username='" + patient_username + '\'' +
-                ", appointmentsList=" + appointmentsList +
-                ", medicalrecordsList=" + medicalrecordsList +
-                ", patient_gender='" + patient_gender + '\'' +
-                ", patient_code='" + patient_code + '\'' +
-                ", patient_img='" + patient_img + '\'' +
-                '}';
     }
 }
