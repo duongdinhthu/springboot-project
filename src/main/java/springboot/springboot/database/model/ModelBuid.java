@@ -315,10 +315,12 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         for (Field field : fields) {
             field.setAccessible(true);
             try {
+
                 Object value = field.get(entity);
                 if (value != null && !"0".equals(value.toString())) {
+
                     // Bỏ field có giá trị là null hoặc 0
-                    System.out.println(value);
+                    System.out.println(value + " field" + field.getName());
                     if (foundField) {
                         query.append(" and ");
                     }

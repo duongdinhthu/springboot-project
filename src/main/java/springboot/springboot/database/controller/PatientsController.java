@@ -119,7 +119,6 @@ public class PatientsController<T extends Entity<?>> {
         System.out.println("gglogin");
         Patients patient = new Patients();
         patient.setPatient_email(email);
-
         List<Patients> patientsList = model.getEntityById(patient);
 
         if (patientsList.isEmpty()) {
@@ -132,9 +131,9 @@ public class PatientsController<T extends Entity<?>> {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("patient_username", patient.getPatient_name());
+        response.put("patient_name", patient.getPatient_name());
         response.put("patient_id", patient.getPatient_id()); // Thêm patient_id vào phản hồi
-
+        System.out.println(response);
         return ResponseEntity.ok(response);
     }
 
