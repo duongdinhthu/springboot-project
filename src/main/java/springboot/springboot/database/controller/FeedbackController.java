@@ -29,11 +29,10 @@ public class FeedbackController {
     @PostMapping("/submit")
     public ResponseEntity<?> submitFeedback(@RequestBody Map<String, String> requestData) {
         try {
+            System.out.println("da goi submit");
             Feedback feedback = modelMapper.map(requestData, Feedback.class);
             feedback.setCreated_at(LocalDateTime.now());
-
             model.saveFeedback(feedback);
-
             return ResponseEntity.ok("Thank you for your feedback!");
         } catch (SQLException e) {
             e.printStackTrace();

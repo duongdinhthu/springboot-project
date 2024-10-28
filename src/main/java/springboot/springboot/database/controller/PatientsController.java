@@ -356,7 +356,7 @@ public class PatientsController<T extends Entity<?>> {
     @PostMapping("/upload-image")
     public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("patient_image") MultipartFile image, @RequestParam("patient_id") Integer patientId) {
         String imagePath = ""; // Tùy chỉnh logic lưu trữ và đường dẫn ảnh
-
+        System.out.println("da goi thanh cong ");
         try {
             // Lưu trữ ảnh và cập nhật đường dẫn ảnh vào cơ sở dữ liệu
             imagePath = saveImage(image);

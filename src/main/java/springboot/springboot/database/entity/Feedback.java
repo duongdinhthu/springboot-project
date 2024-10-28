@@ -76,5 +76,16 @@ public class Feedback extends Entity<Integer> {
         this.created_at = created_at;
     }
 
-
+    @Override
+    public String toString() {
+        return "Feedback{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", subject='" + subject + '\'' +
+                ", message='" + message + '\'' +
+                ", created_at=" + created_at +
+                '}';
+    }
 }

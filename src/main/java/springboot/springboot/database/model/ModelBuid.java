@@ -78,6 +78,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
             query.append("?");
         }
         query.append(")");
+        System.out.println(query.toString());
         return query;
     }
 
@@ -128,7 +129,7 @@ public class ModelBuid<T extends Entity<?>> implements ModelBuidDAO {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-
+        System.out.println(query.toString());
         return query;
     }
 
